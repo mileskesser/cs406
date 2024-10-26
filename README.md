@@ -7,7 +7,7 @@ The dynamic portfolio is a website featuring a diverse collection of interactive
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/mileskesser/cs406.git
-   cd <repository_folder>
+   cd cs406
    
 2. **Install the dependencies:**
    ```bash
