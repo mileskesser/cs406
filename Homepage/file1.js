@@ -7,8 +7,8 @@ app.get('/', (req, res) => {
   res.send(`
     <html>
       <body>
-        <h1>Website 1: Alert Button</h1>
-        <button onclick="alert('Button Clicked!')">Click me</button>
+        <h1> click me </h1>
+        <button onclick="alert('It works!')">Click me</button>
       </body>
     </html>
   `);
