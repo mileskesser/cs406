@@ -7,17 +7,13 @@ const port = 3000;
 
 const projects = [
   { name: 'Test 1', path: './file1.js', port: 3001 },
+  { name: 'Test 2', path: './file2.js', port: 3002 },
+  { name: 'Test 3', path: './file3.js', port: 3003 },
   { name: 'OpenGL Animation', type: 'cpp', makePath: '../OpenGL', executable: './sample', port: 4000 },
-  { name: 'Exercise Tracker App', path: '/Users/mileskesser/Desktop/CS406-main/exercise-app/backend/server.js', port: 5002 },
-  { name: 'Rock Paper Scissors Game', url: '/rock-paper-scissors' },
-  { name: 'Figma Example', url: 'https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496' }
+  { name: 'Exercise Tracker App', path: '/Users/mileskesser/Desktop/CS406-main/exercise-app/backend/server.js', port: 5002 }
 ];
 
 app.use(express.static(path.join(__dirname, '../')));
-
-app.get('/rock-paper-scissors', (req, res) => {
-  res.sendFile(path.join(__dirname, '../rock_paper_scissors.html'));  
-});
 
 app.get('/run-final', (req, res) => {
   const project = projects.find(p => p.name === 'OpenGL Animation');
@@ -63,7 +59,7 @@ app.get('/run-final', (req, res) => {
   }
 });
 
-// start proj processes 
+// Start each Node.js project in a separate process
 projects.forEach((project) => {
   if (project.path && project.type !== 'cpp') {
     const process = spawn('node', [project.path]);
@@ -82,7 +78,7 @@ projects.forEach((project) => {
   }
 });
 
-// app homepage 
+// Serve the homepage
 app.get('/', (req, res) => {
   res.send(`
     <html>
@@ -120,11 +116,10 @@ app.get('/', (req, res) => {
           }
           
           #q1 { background-color: #1e88e5; } 
+          #q2 { background-color: #43a047; } 
+          #q3 { background-color: #fb8c00; } 
           #q5 { background-color: #e53935; }
           #q6 { background-color: #8e24aa; } 
-          #q7 { background-color: #43a047; } 
-          #q8 { background-color: #ff7043; } 
-          
           
           h1 {
             text-align: center;
@@ -139,10 +134,10 @@ app.get('/', (req, res) => {
         <h1>My Projects</h1>
         <div class="container">
           <a href="http://localhost:3001" id="q1" class="quadrant">Test 1</a>
+          <a href="http://localhost:3002" id="q2" class="quadrant">Test 2</a>
+          <a href="http://localhost:3003" id="q3" class="quadrant">Test 3</a>
           <a href="http://localhost:5002" id="q5" class="quadrant">Exercise Tracker App</a>
           <a href="http://localhost:3000/run-final" id="q6" class="quadrant">OpenGL Graphics</a>
-          <a href="/rock-paper-scissors" id="q7" class="quadrant">Rock Paper Scissors Game</a>
-          <a href="https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496" id="q8" class="quadrant">Figma Example</a>
         </div>
       </body>
     </html>
