@@ -118,11 +118,13 @@ app.get('/', (req, res) => {
             transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
           }
-          #q1 { background-color: #1e88e5; }
-          #q5 { background-color: #ff4081; }
-          #q6 { background-color: #dc143c; }
-          #q7 { background-color: #00796b; }
-          #q8 { background-color: #6a1b9a; }
+          
+          #q1 { background-color: #1e88e5; } 
+          #q5 { background-color: #c62828; } 
+          #q6 { background-color: #7b1fa2; } 
+          #q7 { background-color: #388e3c; } 
+          #q8 { background-color: #f4511e; } 
+          
           h1 {
             text-align: center;
             font-size: 36px;
