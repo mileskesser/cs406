@@ -9,29 +9,27 @@ If you have Homebrew and Node installed, skip to step 3, otherwise follow instal
 ### 1. Homebrew
 
 - **Install Homebrew:**  
-  In your terminal run:  
   ```bash
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 ### 2. Node
 
 - **Install Node:**  
-  In your terminal run:  
   ```bash
   brew install node
   
 ### 3. Steps to Run
 
-1. **Clone the repository:**
+- **Clone the repository:**
    ```bash
    git clone https://github.com/mileskesser/dynamic-portfolio.git
    cd dynamic-portfolio
    
-2. **Install the dependencies:**
+- **Install the dependencies:**
    ```bash
    npm install
 
-3. **Start the app:**
+- **Start the app:**
    ```bash
    cd Homepage
    node index.js
