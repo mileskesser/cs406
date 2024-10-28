@@ -120,10 +120,11 @@ app.get('/', (req, res) => {
           }
           
           #q1 { background-color: #1e88e5; } 
-          #q5 { background-color: #c62828; } 
-          #q6 { background-color: #7b1fa2; } 
-          #q7 { background-color: #388e3c; } 
-          #q8 { background-color: #f4511e; } 
+          #q5 { background-color: #e53935; }
+          #q6 { background-color: #8e24aa; } 
+          #q7 { background-color: #43a047; } 
+          #q8 { background-color: #ff7043; } 
+          
           
           h1 {
             text-align: center;
