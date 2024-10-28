@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exercise Tracker</title>
+  <style>
+    /* Reset some default browser styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f7f8fc;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      color: #007BFF;
+      margin-bottom: 20px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    h2 {
+      margin-top: 40px;
+      font-size: 1.75rem;
+      text-align: center;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .form-group {
+      flex: 1 1 calc(50% - 10px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-weight: 500;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .form-group input,
+    .form-group select {
+      padding: 12px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #007BFF;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+    }
+
+    .form-group button {
+      flex: 1 1 100%;
+      padding: 15px;
+      background-color: #007BFF;
+      color: white;
+      font-size: 1.25rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .form-group button:hover {
+      background-color: #0056b3;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table th, table td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    table th {
+      background-color: #007BFF;
+      color: white;
+      text-transform: uppercase;
+      font-size: 1rem;
+    }
+
+    table td {
+      color: #555;
+      font-size: 0.95rem;
+    }
+
+    .delete-btn, .edit-btn {
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .delete-btn {
+      background-color: #dc3545;
+    }
+
+    .delete-btn:hover {
+      background-color: #c82333;
+    }
+
+    .edit-btn {
+      background-color: #28a745;
+    }
+
+    .edit-btn:hover {
+      background-color: #218838;
+    }
+
+    @media (max-width: 768px) {
+      form {
+        flex-direction: column;
+      }
+
+      .form-group {
+        flex: 1 1 100%;
+      }
+
+      table th, table td {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Exercise Tracker</h1>
+    <form id="exercise-form">
+      <input type="hidden" id="exercise-id">
+      <div class="form-group">
+        <label for="name">Exercise Name</label>
+        <input type="text" id="name" placeholder="e.g., Squats" required>
+      </div>
+      <div class="form-group">
+        <label for="reps">Reps</label>
+        <input type="number" id="reps" placeholder="e.g., 12" required>
+      </div>
+      <div class="form-group">
+        <label for="weight">Weight</label>
+        <input type="number" id="weight" placeholder="e.g., 150" required>
+      </div>
+      <div class="form-group">
+        <label for="unit">Unit</label>
+        <select id="unit">
+          <option value="lbs">lbs</option>
+          <option value="kgs">kgs</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="date">Date</label>
+        <input type="date" id="date" required>
+      </div>
+      <div class="form-group">
+        <button type="submit" id="submit-btn">Add Exercise</button>
+      </div>
+    </form>
+
+    <h2>Your Exercises</h2>
+    <table id="exercise-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Reps</th>
+          <th>Weight</th>
+          <th>Unit</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const exerciseForm = document.getElementById('exercise-form');
+    const exerciseTableBody = document.querySelector('#exercise-table tbody');
+    let editing = false;
+
+    // Load exercises from the backend on page load
+    document.addEventListener('DOMContentLoaded', loadExercises);
+
+    // Listen for form submission
+    exerciseForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById('exercise-id').value || Date.now().toString();
+      const name = document.getElementById('name').value;
+      const reps = document.getElementById('reps').value;
+      const weight = document.getElementById('weight').value;
+      const unit = document.getElementById('unit').value;
+      const date = document.getElementById('date').value;
+
+      const exercise = { id, name, reps, weight, unit, date };
+
+      if (editing) {
+        // Edit existing exercise
+        await fetch(`/api/exercises/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(exercise)
+        });
+        editing = false;
+        document.getElementById('submit-btn').textContent = 'Add Exercise';
+      } else {
+        // Add new exercise
+        await fetch('/api/exercises', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(exercise)
+        });
+      }
+
+      // Clear the table and reload exercises
+      exerciseTableBody.innerHTML = '';
+      loadExercises();
+
+      // Clear the form
+      exerciseForm.reset();
+      document.getElementById('exercise-id').value = '';
+    });
+
+    // Load exercises from backend and populate the table
+    async function loadExercises() {
+      const response = await fetch('/api/exercises');
+      const exercises = await response.json();
+      exerciseTableBody.innerHTML = '';  // Clear existing rows
+      exercises.forEach(exercise => addExerciseToTable(exercise));
+    }
+
+    function addExerciseToTable(exercise) {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${exercise.name}</td>
+        <td>${exercise.reps}</td>
+        <td>${exercise.weight}</td>
+        <td>${exercise.unit}</td>
+        <td>${new Date(exercise.date).toLocaleDateString()}</td>
+        <td>
+          <button class="edit-btn" onclick="editExercise('${exercise.id}')">Edit</button>
+          <button class="delete-btn" onclick="deleteExercise('${exercise.id}')">Delete</button>
+        </td>
+      `;
+      exerciseTableBody.appendChild(row);
+    }
+
+    // Edit exercise
+    function editExercise(id) {
+      fetch(`/api/exercises/${id}`)
+        .then(response => response.json())
+        .then(exercise => {
+          document.getElementById('exercise-id').value = exercise.id;
+          document.getElementById('name').value = exercise.name;
+          document.getElementById('reps').value = exercise.reps;
+          document.getElementById('weight').value = exercise.weight;
+          document.getElementById('unit').value = exercise.unit;
+          document.getElementById('date').value = exercise.date;
+          document.getElementById('submit-btn').textContent = 'Update Exercise';
+          editing = true;
+        });
+    }
+
+    // Delete exercise from backend and update the table
+    async function deleteExercise(id) {
+      await fetch(`/api/exercises/${id}`, { method: 'DELETE' });
+      exerciseTableBody.innerHTML = '';
+      loadExercises();
+    }
+  </script>
+</body>
+</html>

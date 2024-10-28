@@ -1,0 +1,17 @@
+
+<resources>
+    <string name="app_name">A3</string>
+    <string name="name">Miles Kesser</string>
+    <string name="cs_161">Introduction to Computer Science I</string>
+    <string name="cs_162">Introduction to Computer Science II</string>
+    <string name="cs_225">Discrete Structures in Computer Science</string>
+    <string name="cs_261">Data Structures</string>
+    <string name="cs_271">Computer Architecture and Assembly Language</string>
+    <string name="cs_290">Web Development</string>
+    <string name="cs_325">Analysis of Algorithms</string>
+    <string name="cs_340">Introduction to Databases</string>
+    <string name="cs_344">Operating Systems I</string>
+    <string name="cs_361">Software Engineering I</string>
+    <string name="cs_362">Software Engineering II</string>
+    <string name="cs_467">Online Capstone Project</string>
+</resources>

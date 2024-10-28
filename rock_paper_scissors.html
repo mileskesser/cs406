@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors - Best of 3</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            margin-top: 20px;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .score {
+            font-size: 20px;
+            margin: 20px 0;
+        }
+        .choices {
+            display: flex;
+            justify-content: center;
+        }
+        .choice {
+            margin: 0 15px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .choice img {
+            width: 100px;
+            height: 100px;
+            transition: transform 0.2s ease;
+        }
+        .choice:hover img {
+            transform: scale(1.1);
+        }
+        .result {
+            font-size: 24px;
+            margin-top: 20px;
+            color: #333;
+        }
+        .instructions {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .large-choice img {
+            width: 150px;
+            height: 150px;
+        }
+        #loadingIcon {
+            display: none;
+            font-size: 36px;
+            margin-top: 20px;
+            animation: spin 1s infinite linear;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #overlay, #congratsOverlay, #robotWinsOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        #overlayText, #robotWinsText {
+            font-size: 36px;
+            animation: fadein 1s;
+            line-height: 1.6;
+        }
+        @keyframes fadein {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        /* Gold Medal Overlay */
+        #congratsOverlay {
+            display: none;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.8);
+        }
+        #medalContainer {
+            position: relative;
+        }
+        #congratsMessage {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 26px;
+            color: black;
+            text-align: center;
+            width: 250px;
+        }
+        #goldMedal {
+            width: 350px;
+            height: 350px;
+        }
+        #playAgainBtn, #robotPlayAgainBtn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        #playAgainBtn:hover, #robotPlayAgainBtn:hover {
+            background: #45a049;
+        }
+        /* Robot Wins Overlay */
+        #robotWinsOverlay {
+            display: none;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.8);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Rock Paper Scissors - Best of 3</h1>
+    <p class="instructions">Choose Rock, Paper, or Scissors to start the game.</p>
+
+    <div class="score">
+        Your Score: <span id="playerScore">0</span> | Robot Score: <span id="robotScore">0</span>
+    </div>
+
+    <div class="container">
+        <div class="choices">
+            <div class="choice" id="rock">
+                <img src="./rock.png" alt="Rock">
+                <p>Rock</p>
+            </div>
+            <div class="choice" id="paper">
+                <img src="./paper.png" alt="Paper">
+                <p>Paper</p>
+            </div>
+            <div class="choice" id="scissors">
+                <img src="./scissors.png" alt="Scissors">
+                <p>Scissors</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="result" id="resultText">Choose your move to play!</div>
+    <div id="loadingIcon">🤖</div>
+
+    <!-- Overlay for Round Results -->
+    <div id="overlay">
+        <div id="overlayText"></div>
+    </div>
+
+    <!-- Congratulations Overlay with Gold Medal -->
+    <div id="congratsOverlay">
+        <div id="medalContainer">
+            <img id="goldMedal" src="./gold-medal.png" alt="Gold Medal">
+            <div id="congratsMessage">Congrats!<br>You won!</div>
+        </div>
+        <button id="playAgainBtn" onclick="resetGame()">Play Again</button>
+    </div>
+
+    <!-- Robot Wins Overlay -->
+    <div id="robotWinsOverlay">
+        <div id="robotWinsText">Robot Wins! Better Luck Next Time!</div>
+        <button id="robotPlayAgainBtn" onclick="resetGame()">Play Again</button>
+    </div>
+
+    <script>
+        let playerScore = 0;
+        let robotScore = 0;
+        let roundNumber = 1;
+
+        const choices = ["rock", "paper", "scissors"];
+        const choiceElements = document.querySelectorAll('.choice');
+        const resultText = document.getElementById('resultText');
+        const loadingIcon = document.getElementById('loadingIcon');
+        const overlay = document.getElementById('overlay');
+        const overlayText = document.getElementById('overlayText');
+        const congratsOverlay = document.getElementById('congratsOverlay');
+        const robotWinsOverlay = document.getElementById('robotWinsOverlay');
+
+        choiceElements.forEach(choice => choice.addEventListener('click', handleClick));
+
+        function handleClick(event) {
+            const playerChoice = event.currentTarget.id;
+
+            resultText.innerHTML = "";
+
+            highlightPlayerChoice(playerChoice);
+
+            loadingIcon.style.display = "block";
+
+            setTimeout(() => {
+                loadingIcon.style.display = "none";
+                playRound(playerChoice);
+            }, 1000);
+        }
+
+        function highlightPlayerChoice(playerChoice) {
+            choiceElements.forEach(choice => choice.classList.remove('large-choice'));
+            document.getElementById(playerChoice).classList.add('large-choice');
+        }
+
+        function resetChoiceSize() {
+            choiceElements.forEach(choice => choice.classList.remove('large-choice'));
+        }
+
+        function playRound(playerChoice) {
+            const robotChoice = choices[Math.floor(Math.random() * choices.length)];
+            const winner = determineWinner(playerChoice, robotChoice);
+
+            if (winner === "you") {
+                playerScore++;
+            } else if (winner === "robot") {
+                robotScore++;
+            }
+
+            document.getElementById('playerScore').innerText = playerScore;
+            document.getElementById('robotScore').innerText = robotScore;
+
+            showOverlay(winner, playerChoice, robotChoice);
+
+            resetChoiceSize();
+            roundNumber++;
+            checkGameOver();
+        }
+
+        function showOverlay(winner, playerChoice, robotChoice) {
+            overlayText.innerHTML = `You chose <strong>${capitalize(playerChoice)}</strong>. Robot chose <strong>${capitalize(robotChoice)}</strong>.<br><br>`;
+            overlayText.innerHTML += winner === "tie" ? "It's a Tie!" : winner === "you" ? "You Win the Round!" : "Robot Wins the Round!";
+            overlay.style.display = "flex";
+
+            setTimeout(() => {
+                overlay.style.display = "none";
+            }, 2000);
+        }
+
+        function checkGameOver() {
+            if (playerScore >= 2 || robotScore >= 2) {
+                setTimeout(() => endGame(), 500);
+            }
+        }
+
+        function endGame() {
+            if (playerScore > robotScore) {
+                congratsOverlay.style.display = "flex"; // Show the gold medal overlay
+            } else {
+                robotWinsOverlay.style.display = "flex"; // Show the robot wins overlay
+            }
+            disableChoices();
+        }
+
+        function resetGame() {
+            playerScore = 0;
+            robotScore = 0;
+            roundNumber = 1;
+            document.getElementById('playerScore').innerText = playerScore;
+            document.getElementById('robotScore').innerText = robotScore;
+            resultText.innerHTML = "Choose your move to play!";
+            congratsOverlay.style.display = "none";
+            robotWinsOverlay.style.display = "none";
+            choiceElements.forEach(choice => choice.addEventListener('click', handleClick));
+        }
+
+        function disableChoices() {
+            choiceElements.forEach(choice => choice.removeEventListener('click', handleClick));
+        }
+
+        function determineWinner(player, robot) {
+            if (player === robot) {
+                return "tie";
+            } else if (
+                (player === "rock" && robot === "scissors") ||
+                (player === "scissors" && robot === "paper") ||
+                (player === "paper" && robot === "rock")
+            ) {
+                return "you";
+            } else {
+                return "robot";
+            }
+        }
+
+        function capitalize(word) {
+            return word.charAt(0).toUpperCase() + word.slice(1);
+        }
+    </script>
+
+</body>
+</html>
