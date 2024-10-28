@@ -35,6 +35,3 @@ Before you begin, ensure you have Homebrew and Node installed. If you do, skip t
    ```bash
    cd Homepage
    node index.js
-
-
-
