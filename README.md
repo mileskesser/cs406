@@ -4,7 +4,7 @@ The dynamic portfolio is a website featuring a diverse collection of interactive
 
 ## Prerequisites
 
-Before you begin, ensure you have Homebrew and Node installed. If you do, skip to step 3, otherwise follow install instructions below: 
+If you have Homebrew and Node installed, skip to step 3, otherwise follow install instructions below: 
 
 ### 1. Homebrew
 
