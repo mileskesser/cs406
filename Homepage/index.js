@@ -5,7 +5,6 @@ const path = require('path');
 const app = express();
 const port = 3000;
 
-// Array containing project information: name, file path, and port number
 const projects = [
   { name: 'Test 1', path: './file1.js', port: 3001 },
   { name: 'OpenGL Animation', type: 'cpp', makePath: '../OpenGL', executable: './sample', port: 4000 },
@@ -14,22 +13,18 @@ const projects = [
   { name: 'Figma Example', url: 'https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496' }
 ];
 
-// Serve static files like images from the CS406-main root directory
 app.use(express.static(path.join(__dirname, '../')));
 
-// Serve the Rock-Paper-Scissors HTML file directly from the root directory
 app.get('/rock-paper-scissors', (req, res) => {
-  res.sendFile(path.join(__dirname, '../rock_paper_scissors.html'));  // Corrected path
+  res.sendFile(path.join(__dirname, '../rock_paper_scissors.html'));  
 });
 
-// Route to build and run the OpenGL project
 app.get('/run-final', (req, res) => {
   const project = projects.find(p => p.name === 'OpenGL Animation');
 
   if (project) {
     console.log(`Building and running ${project.name}...`);
 
-    // Step 1: Run `make` to build the project
     const makeProcess = spawn('make', [], { cwd: path.resolve(__dirname, project.makePath) });
 
     makeProcess.stdout.on('data', (data) => {
@@ -44,7 +39,6 @@ app.get('/run-final', (req, res) => {
       if (code === 0) {
         console.log(`${project.name} built successfully. Running executable...`);
 
-        // Step 2: Run the executable after a successful build
         const executableProcess = spawn(project.executable, [], { cwd: path.resolve(__dirname, project.makePath) });
 
         executableProcess.stdout.on('data', (data) => {
@@ -59,7 +53,6 @@ app.get('/run-final', (req, res) => {
           console.log(`${project.name} process exited with code ${code}`);
         });
 
-        // Send response to the user that the C++ project is running
         res.send(`<h1>${project.name} project is running and will launch momentarily! You can click and drag to interact with the animation</h1>`);
       } else {
         res.send(`<h1>${project.name} failed to build with code ${code}</h1>`);
@@ -70,7 +63,7 @@ app.get('/run-final', (req, res) => {
   }
 });
 
-// Start each Node.js project in a separate process
+// start proj processes 
 projects.forEach((project) => {
   if (project.path && project.type !== 'cpp') {
     const process = spawn('node', [project.path]);
@@ -89,7 +82,7 @@ projects.forEach((project) => {
   }
 });
 
-// Express app to serve a homepage linking to all projects
+// app homepage 
 app.get('/', (req, res) => {
   res.send(`
     <html>
