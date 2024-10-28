@@ -7,7 +7,6 @@ The dynamic portfolio is a website featuring a diverse collection of interactive
 Before you begin, ensure you have Homebrew and Node installed. If you do, skip to step 3, otherwise follow install instructions below: 
 
 ### 1. Homebrew
-If you don’t have it installed, follow these steps:
 
 - **Install Homebrew:**  
   In your terminal run:  
@@ -15,7 +14,6 @@ If you don’t have it installed, follow these steps:
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 ### 2. Node
-If you don’t have it installed, follow these steps:
 
 - **Install Node:**  
   In your terminal run:  
