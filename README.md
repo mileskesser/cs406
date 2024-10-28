@@ -8,7 +8,6 @@ The dynamic portfolio is a website featuring a diverse collection of interactive
    ```bash
    git clone https://github.com/mileskesser/dynamic-portfolio.git
    cd dynamic-portfolio
-   cd Homepage
    
 2. **Install the dependencies:**
    ```bash
@@ -16,4 +15,5 @@ The dynamic portfolio is a website featuring a diverse collection of interactive
 
 3. **Start the app:**
    ```bash
+   cd Homepage
    node index.js
