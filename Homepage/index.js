@@ -7,7 +7,7 @@ const port = 3000;
 
 const projects = [
   { name: 'OpenGL Animation', type: 'cpp', makePath: '../OpenGL', executable: './sample', port: 4000 },
-  { name: 'Exercise Tracker App', path: '/Users/mileskesser/Desktop/CS406-main/exercise-app/backend/server.js', port: 5002 },
+  { name: 'Exercise Tracker App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/exercise-app/backend/server.js', port: 5002 },
   { name: 'Rock Paper Scissors Game', url: '/rock-paper-scissors' },
   { name: 'Figma Example', url: 'https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496' },
   { name: 'Weather App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/weatherApp/backend/server.js', port: 5008 }
@@ -263,30 +263,31 @@ app.get('/', (req, res) => {
           <a href="http://localhost:5002" id="q1" class="quadrant">
             <div class="title">Exercise Tracker API</div>
             <img src="www.png" alt="Exercise Tracker Image">
-            <p>A powerful tool for tracking exercise progress and routines.</p>
+            <p>A full stack REST API website for tracking workouts..</p>
           </a>
           <a href="http://localhost:3000/run-final" id="q2" class="quadrant">
             <div class="title">OpenGL Graphics</div>
             <img src="opengl.png" alt="OpenGL Animation Image">
-            <p>High-performance animations rendered with OpenGL.</p>
+            <p>Billiards table annimation rendered with OpenGL.</p>
           </a>
           <a href="/rock-paper-scissors" id="q3" class="quadrant">
             <div class="title">Rock Paper Scissors Game</div>
             <img src="RPS.png" alt="Rock Paper Scissors Image">
-            <p>Classic game recreated with modern, interactive UI.</p>
+            <p>Classic rock paper scissors against a robot opponent.</p>
           </a>
           <a href="https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496" id="q4" class="quadrant">
-            <div class="title">Figma</div>
+            <div class="title">Figma Prototype</div>
             <img src="figma.png" alt="Figma Example Image">
-            <p>Prototyping tool to create and showcase design projects.</p>
+            <p>Figma prototype for a book review website.</p>
           </a>
           <a href="http://localhost:3000/run-weather-app" id="q5" class="quadrant">
             <div class="title">Weather App</div>
-            <p>Displays weather with dynamic city backgrounds.</p>
+            <img src="weather.png" alt="Weather Dashboard Image">
+            <p>Displays weather with locational city backgrounds.</p>
           </a>
           <a href="http://localhost:3000/run-android" id="q6" class="quadrant">
             <div class="title">Android Studio Project</div>
-            <p>Comprehensive Android app development and launch environment.</p>
+            <p>Android Kotlin mobile app emulation.</p>
           </a>
         </div>
       </body>
