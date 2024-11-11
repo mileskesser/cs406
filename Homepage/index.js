@@ -6,11 +6,11 @@ const app = express();
 const port = 3000;
 
 const projects = [
-  { name: 'Test 1', path: './file1.js', port: 3001 },
   { name: 'OpenGL Animation', type: 'cpp', makePath: '../OpenGL', executable: './sample', port: 4000 },
   { name: 'Exercise Tracker App', path: '/Users/mileskesser/Desktop/CS406-main/exercise-app/backend/server.js', port: 5002 },
   { name: 'Rock Paper Scissors Game', url: '/rock-paper-scissors' },
-  { name: 'Figma Example', url: 'https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496' }
+  { name: 'Figma Example', url: 'https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496' },
+  { name: 'Weather App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/weatherApp/backend/server.js', port: 5008 }
 ];
 
 app.use(express.static(path.join(__dirname, '../')));
@@ -63,7 +63,106 @@ app.get('/run-final', (req, res) => {
   }
 });
 
-// start proj processes 
+// New route to build and run the Android Project (A3) in an emulator
+app.get('/run-android', (req, res) => {
+  const projectPath = '/Users/mileskesser/Desktop/dynamic-portfolio/A3';
+  const emulatorName = 'Pixel 8 Pro API 35';
+  const javaHomePath = '/Library/Java/JavaVirtualMachines/jdk-17.0.1.jdk/Contents/Home'; // Replace with the correct path
+
+
+  console.log(`Building Android project at ${projectPath}...`);
+
+  // Step 1: Build the project with Gradle
+  const gradleBuild = spawn('./gradlew', ['assembleDebug'], {
+    cwd: projectPath,
+    shell: true,
+    env: { ...process.env, JAVA_HOME: javaHomePath } // Use actual Java path
+  });
+
+  gradleBuild.stdout.on('data', (data) => {
+    console.log(`Gradle build output: ${data}`);
+  });
+
+  gradleBuild.stderr.on('data', (data) => {
+    console.error(`Gradle build error: ${data}`);
+  });
+
+  gradleBuild.on('close', (code) => {
+    if (code === 0) {
+      console.log('Build successful, launching emulator...');
+
+      // Step 2: Start the emulator
+      const emulatorProcess = spawn('emulator', ['-avd', emulatorName], {
+        detached: true,
+        stdio: 'ignore'
+      });
+
+      emulatorProcess.unref();
+
+      setTimeout(() => {
+        // Step 3: Install and run the APK in the emulator
+        const apkPath = path.join(projectPath, 'app/build/outputs/apk/debug/app-debug.apk');
+        const installProcess = spawn('adb', ['-s', 'emulator-5554', 'install', '-r', apkPath]);
+
+        installProcess.stdout.on('data', (data) => {
+          console.log(`Install output: ${data}`);
+        });
+
+        installProcess.stderr.on('data', (data) => {
+          console.error(`Install error: ${data}`);
+        });
+
+        installProcess.on('close', (code) => {
+          if (code === 0) {
+            console.log('APK installed, launching the app...');
+
+            const launchProcess = spawn('adb', ['-s', 'emulator-5554', 'shell', 'monkey', '-p', 'com.example.a3', '-c', 'android.intent.category.LAUNCHER', '1']);
+
+            launchProcess.stdout.on('data', (data) => {
+              console.log(`Launch output: ${data}`);
+            });
+
+            launchProcess.stderr.on('data', (data) => {
+              console.error(`Launch error: ${data}`);
+            });
+
+            launchProcess.on('close', (code) => {
+              if (code === 0) {
+                console.log('App launched successfully!');
+                res.send('<h1>Android Project A3 is running in the emulator!</h1>');
+              } else {
+                res.send('<h1>Failed to launch the app in the emulator.</h1>');
+              }
+            });
+          } else {
+            res.send('<h1>Failed to install the APK in the emulator.</h1>');
+          }
+        });
+      }, 15000); // Wait for the emulator to boot up before installing APK
+    } else {
+      res.send('<h1>Gradle build failed.</h1>');
+    }
+  });
+});
+
+// Route to directly launch the Weather App on port 5008
+app.get('/run-weather-app', (req, res) => {
+  const project = projects.find(p => p.name === 'Weather App');
+  if (project) {
+    console.log(`Starting ${project.name} on port ${project.port}...`);
+    const weatherProcess = spawn('node', [project.path]);
+
+    weatherProcess.stdout.on('data', (data) => console.log(`${project.name} output: ${data}`));
+    weatherProcess.stderr.on('data', (data) => console.error(`${project.name} error: ${data}`));
+
+    weatherProcess.on('close', (code) => console.log(`${project.name} process exited with code ${code}`));
+    res.redirect(`http://localhost:${project.port}/weather`);
+  } else {
+    res.send('<h1>Weather App project not found!</h1>');
+  }
+});
+
+
 projects.forEach((project) => {
   if (project.path && project.type !== 'cpp') {
     const process = spawn('node', [project.path]);
@@ -82,8 +181,6 @@ projects.forEach((project) => {
   }
 });
 
-// app homepage 
-// app homepage 
 app.get('/', (req, res) => {
   res.send(`
     <html>
@@ -93,67 +190,110 @@ app.get('/', (req, res) => {
             height: 100%;
             margin: 0;
             font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f4f4f9;
+            background-color: #1c1c1e;
+            color: #e0e0e0;
           }
           .container {
             display: grid;
-            grid-template-columns: repeat(4, 1fr); /* 4 columns per row */
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             grid-gap: 20px;
-            padding: 50px;
+            padding: 60px;
             max-width: 1200px;
             margin: auto;
           }
           .quadrant {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            color: white;
+            color: #ffffff;
             text-align: center;
             text-decoration: none;
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: 15px;
+            padding: 30px;
+            background: #333333;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            height: 300px; /* Fixed height to make the cards larger */
-            word-break: break-word; /* Prevents text overflow */
+            height: 300px;
+            position: relative;
+            border: 1px solid #444444;
           }
           .quadrant:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-8px);
+            box-shadow: 0px 12px 20px rgba(0, 0, 0, 0.6);
           }
-          
-          #q1 { background-color: #1e88e5; } 
-          #q5 { background-color: #e53935; }
-          #q6 { background-color: #8e24aa; } 
-          #q7 { background-color: #43a047; } 
-          #q8 { background-color: #ff7043; } 
-          
+          .title {
+            position: absolute;
+            top: 20px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+            width: 100%;
+            text-align: center;
+          }
+          #q1 { background-color: #007bff; }
+          #q2 { background-color: #dc3545; }
+          #q3 { background-color: #6f42c1; }
+          #q4 { background-color: #28a745; }
+          #q5 { background-color: #ff8c42; }
+          .quadrant img {
+            width: 70%;
+            height: 60%;
+            object-fit: contain;
+            margin-top: 20px;
+          }
+          .quadrant p {
+            font-size: 14px;
+            color: #cccccc;
+            margin-top: 15px;
+          }
           h1 {
             text-align: center;
             font-size: 36px;
-            color: #333;
-            margin-bottom: 20px;
+            color: #ffffff;
+            margin-bottom: 40px;
+            padding-top: 20px;
           }
         </style>
-        <title>Professional Project Portfolio</title>
+        <title>Dark-Themed Project Portfolio</title>
       </head>
       <body>
-        <h1>My Projects</h1>
+        <h1>Project Portfolio</h1>
         <div class="container">
-          <a href="http://localhost:3001" id="q1" class="quadrant">Test 1</a>
-          <a href="http://localhost:5002" id="q5" class="quadrant">Exercise Tracker App</a>
-          <a href="http://localhost:3000/run-final" id="q6" class="quadrant">OpenGL Graphics</a>
-          <a href="/rock-paper-scissors" id="q7" class="quadrant">Rock Paper Scissors Game</a>
-          <a href="https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496" id="q8" class="quadrant">Figma Example</a>
+          <a href="http://localhost:5002" id="q1" class="quadrant">
+            <div class="title">Exercise Tracker API</div>
+            <img src="www.png" alt="Exercise Tracker Image">
+            <p>A powerful tool for tracking exercise progress and routines.</p>
+          </a>
+          <a href="http://localhost:3000/run-final" id="q2" class="quadrant">
+            <div class="title">OpenGL Graphics</div>
+            <img src="opengl.png" alt="OpenGL Animation Image">
+            <p>High-performance animations rendered with OpenGL.</p>
+          </a>
+          <a href="/rock-paper-scissors" id="q3" class="quadrant">
+            <div class="title">Rock Paper Scissors Game</div>
+            <img src="RPS.png" alt="Rock Paper Scissors Image">
+            <p>Classic game recreated with modern, interactive UI.</p>
+          </a>
+          <a href="https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496" id="q4" class="quadrant">
+            <div class="title">Figma</div>
+            <img src="figma.png" alt="Figma Example Image">
+            <p>Prototyping tool to create and showcase design projects.</p>
+          </a>
+          <a href="http://localhost:3000/run-weather-app" id="q5" class="quadrant">
+            <div class="title">Weather App</div>
+            <p>Displays weather with dynamic city backgrounds.</p>
+          </a>
+          <a href="http://localhost:3000/run-android" id="q6" class="quadrant">
+            <div class="title">Android Studio Project</div>
+            <p>Comprehensive Android app development and launch environment.</p>
+          </a>
         </div>
       </body>
     </html>
   `);
 });
 
-
-// Start the Express server
 app.listen(port, () => {
   console.log(`\nPortfolio homepage running at http://localhost:${port}\n`);
 });

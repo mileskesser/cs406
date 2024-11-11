@@ -7,60 +7,79 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f4f4f4;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
             color: #333;
+            text-align: center;
         }
+
         h1 {
-            margin-top: 20px;
+            font-size: 3em;
+            color: #4CAF50;
+            margin: 0.5em 0;
         }
-        .container {
-            margin-top: 30px;
+
+        .instructions {
+            font-size: 1.8em;
+            color: #555;
+            margin-bottom: 0.5em;
         }
+
         .score {
-            font-size: 20px;
-            margin: 20px 0;
+            font-size: 2em;
+            margin: 1em 0;
+            color: #666;
         }
+
         .choices {
             display: flex;
             justify-content: center;
+            margin: 1em 0;
         }
+
         .choice {
-            margin: 0 15px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 0 20px;
         }
+
         .choice img {
-            width: 100px;
-            height: 100px;
-            transition: transform 0.2s ease;
-        }
-        .choice:hover img {
-            transform: scale(1.1);
-        }
-        .result {
-            font-size: 24px;
-            margin-top: 20px;
-            color: #333;
-        }
-        .instructions {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-        .large-choice img {
             width: 150px;
             height: 150px;
+            transition: transform 0.2s ease;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
+
+        .choice:hover img {
+            transform: scale(1.2);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .result {
+            font-size: 2em;
+            color: #333;
+            margin: 1em 0;
+        }
+
         #loadingIcon {
             display: none;
-            font-size: 36px;
-            margin-top: 20px;
+            font-size: 3em;
+            margin-top: 1em;
             animation: spin 1s infinite linear;
+            color: #888;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
         #overlay, #congratsOverlay, #robotWinsOverlay {
             display: none;
             position: fixed;
@@ -68,49 +87,43 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             color: #fff;
             text-align: center;
             justify-content: center;
             align-items: center;
             z-index: 999;
+            padding: 20px;
         }
-        #overlayText, #robotWinsText {
-            font-size: 36px;
+
+        #overlayText {
+            font-size: 2.5em; /* Larger font size for overlay text */
             animation: fadein 1s;
             line-height: 1.6;
+            margin-bottom: 20px;
         }
-        @keyframes fadein {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        /* Gold Medal Overlay */
-        #congratsOverlay {
-            display: none;
+
+        #congratsContent, #robotWinsContent {
+            display: flex;
             flex-direction: column;
-            background: rgba(0, 0, 0, 0.8);
-        }
-        #medalContainer {
-            position: relative;
-        }
-        #congratsMessage {
-            position: absolute;
-            top: 35%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 26px;
-            color: black;
+            align-items: center;
             text-align: center;
-            width: 250px;
         }
+
         #goldMedal {
-            width: 350px;
-            height: 350px;
+            width: 150px;
+            margin-bottom: 20px;
         }
+
+        #congratsMessage, #robotWinsText {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #FFD700; /* Gold color for the congratulatory message */
+        }
+
         #playAgainBtn, #robotPlayAgainBtn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 18px;
+            padding: 15px 40px;
+            font-size: 1.2em;
             cursor: pointer;
             background: #4CAF50;
             color: #fff;
@@ -118,14 +131,14 @@
             border-radius: 5px;
             transition: background 0.3s ease;
         }
+
         #playAgainBtn:hover, #robotPlayAgainBtn:hover {
             background: #45a049;
         }
 
-        #robotWinsOverlay {
-            display: none;
-            flex-direction: column;
-            background: rgba(0, 0, 0, 0.8);
+        @keyframes fadein {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
@@ -138,20 +151,18 @@
         Your Score: <span id="playerScore">0</span> | Robot Score: <span id="robotScore">0</span>
     </div>
 
-    <div class="container">
-        <div class="choices">
-            <div class="choice" id="rock">
-                <img src="./RPS-pngs/rock.png" alt="Rock">
-                <p>Rock</p>
-            </div>
-            <div class="choice" id="paper">
-                <img src="./RPS-pngs/paper.png" alt="Paper">
-                <p>Paper</p>
-            </div>
-            <div class="choice" id="scissors">
-                <img src="./RPS-pngs/scissors.png" alt="Scissors">
-                <p>Scissors</p>
-            </div>
+    <div class="choices">
+        <div class="choice" id="rock">
+            <img src="./RPS-pngs/rock.png" alt="Rock">
+            <p>Rock</p>
+        </div>
+        <div class="choice" id="paper">
+            <img src="./RPS-pngs/paper.png" alt="Paper">
+            <p>Paper</p>
+        </div>
+        <div class="choice" id="scissors">
+            <img src="./RPS-pngs/scissors.png" alt="Scissors">
+            <p>Scissors</p>
         </div>
     </div>
 
@@ -165,23 +176,24 @@
 
     <!-- Congratulations Overlay with Gold Medal -->
     <div id="congratsOverlay">
-        <div id="medalContainer">
-            <img id="goldMedal" src="./gold-medal.png" alt="Gold Medal">
-            <div id="congratsMessage">Congrats!<br>You won!</div>
+        <div id="congratsContent">
+            <img id="goldMedal" src="./RPS-pngs/gold-medal.png" alt="Gold Medal">
+            <div id="congratsMessage">Congrats! You won!</div>
+            <button id="playAgainBtn" onclick="resetGame()">Play Again</button>
         </div>
-        <button id="playAgainBtn" onclick="resetGame()">Play Again</button>
     </div>
 
     <!-- Robot Wins Overlay -->
     <div id="robotWinsOverlay">
-        <div id="robotWinsText">Robot Wins! Better Luck Next Time!</div>
-        <button id="robotPlayAgainBtn" onclick="resetGame()">Play Again</button>
+        <div id="robotWinsContent">
+            <div id="robotWinsText">Robot Wins! Better Luck Next Time!</div>
+            <button id="robotPlayAgainBtn" onclick="resetGame()">Play Again</button>
+        </div>
     </div>
 
     <script>
         let playerScore = 0;
         let robotScore = 0;
-        let roundNumber = 1;
 
         const choices = ["rock", "paper", "scissors"];
         const choiceElements = document.querySelectorAll('.choice');
@@ -214,10 +226,6 @@
             document.getElementById(playerChoice).classList.add('large-choice');
         }
 
-        function resetChoiceSize() {
-            choiceElements.forEach(choice => choice.classList.remove('large-choice'));
-        }
-
         function playRound(playerChoice) {
             const robotChoice = choices[Math.floor(Math.random() * choices.length)];
             const winner = determineWinner(playerChoice, robotChoice);
@@ -233,8 +241,6 @@
 
             showOverlay(winner, playerChoice, robotChoice);
 
-            resetChoiceSize();
-            roundNumber++;
             checkGameOver();
         }
 
@@ -256,9 +262,9 @@
 
         function endGame() {
             if (playerScore > robotScore) {
-                congratsOverlay.style.display = "flex"; // Show the gold medal overlay
+                congratsOverlay.style.display = "flex";
             } else {
-                robotWinsOverlay.style.display = "flex"; // Show the robot wins overlay
+                robotWinsOverlay.style.display = "flex";
             }
             disableChoices();
         }
@@ -266,7 +272,6 @@
         function resetGame() {
             playerScore = 0;
             robotScore = 0;
-            roundNumber = 1;
             document.getElementById('playerScore').innerText = playerScore;
             document.getElementById('robotScore').innerText = robotScore;
             resultText.innerHTML = "Choose your move to play!";
