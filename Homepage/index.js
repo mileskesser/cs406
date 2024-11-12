@@ -10,7 +10,8 @@ const projects = [
   { name: 'Exercise Tracker App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/exercise-app/backend/server.js', port: 5002 },
   { name: 'Rock Paper Scissors Game', url: '/rock-paper-scissors' },
   { name: 'Figma Example', url: 'https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496' },
-  { name: 'Weather App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/weatherApp/backend/server.js', port: 5008 }
+  { name: 'Weather App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/weatherApp/backend/server.js', port: 5008 }, 
+  { name: 'Video Project', url: '/play-video' }
 ];
 
 app.use(express.static(path.join(__dirname, '../')));
@@ -181,117 +182,314 @@ projects.forEach((project) => {
   }
 });
 
+// Route to serve the video player page
+app.get('/play-video', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Video Player</title>
+      <style>
+        body {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 70%;
+          margin: 0;
+          background-color: #1c1c1e;
+          color: #e0e0e0;
+          font-family: Arial, sans-serif;
+        }
+        .video-container {
+          text-align: center;
+        }
+        video {
+          
+          max-width: 90%;
+          max-height: 90%;
+          border-radius: 8px;
+          box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+        }
+      </style>
+    </head>
+    <body>
+      <div class="video-container">
+        <h1>Video Test</h1>
+        <video controls>
+          <source src="/video.mov" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </body>
+    </html>
+  `);
+});
+
+// Serve the video file directly
+app.get('/video.mov', (req, res) => {
+  const videoPath = path.join(__dirname, 'video.mov');
+  res.sendFile(videoPath, (err) => {
+    if (err) {
+      console.error("Error serving video file:", err);
+      res.status(404).send("Video file not found");
+    } else {
+      console.log("Serving video file at /video.mov");
+    }
+  });
+});
+
+
+
 app.get('/', (req, res) => {
   res.send(`
-    <html>
-      <head>
-        <style>
-          body, html {
-            height: 100%;
-            margin: 0;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: #1c1c1e;
-            color: #e0e0e0;
-          }
-          .container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            grid-gap: 20px;
-            padding: 60px;
-            max-width: 1200px;
-            margin: auto;
-          }
-          .quadrant {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #ffffff;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 15px;
-            padding: 30px;
-            background: #333333;
-            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            height: 300px;
-            position: relative;
-            border: 1px solid #444444;
-          }
-          .quadrant:hover {
-            transform: translateY(-8px);
-            box-shadow: 0px 12px 20px rgba(0, 0, 0, 0.6);
-          }
-          .title {
-            position: absolute;
-            top: 20px;
-            font-size: 20px;
-            font-weight: 600;
-            color: #ffffff;
-            width: 100%;
-            text-align: center;
-          }
-          #q1 { background-color: #007bff; }
-          #q2 { background-color: #dc3545; }
-          #q3 { background-color: #6f42c1; }
-          #q4 { background-color: #28a745; }
-          #q5 { background-color: #ff8c42; }
-          .quadrant img {
-            width: 70%;
-            height: 60%;
-            object-fit: contain;
-            margin-top: 20px;
-          }
-          .quadrant p {
-            font-size: 14px;
-            color: #cccccc;
-            margin-top: 15px;
-          }
-          h1 {
-            text-align: center;
-            font-size: 36px;
-            color: #ffffff;
-            margin-bottom: 40px;
-            padding-top: 20px;
-          }
-        </style>
-        <title>Dark-Themed Project Portfolio</title>
-      </head>
-      <body>
-        <h1>Project Portfolio</h1>
-        <div class="container">
-          <a href="http://localhost:5002" id="q1" class="quadrant">
-            <div class="title">Exercise Tracker API</div>
-            <img src="www.png" alt="Exercise Tracker Image">
-            <p>A full stack REST API website for tracking workouts..</p>
-          </a>
-          <a href="http://localhost:3000/run-final" id="q2" class="quadrant">
-            <div class="title">OpenGL Graphics</div>
-            <img src="opengl.png" alt="OpenGL Animation Image">
-            <p>Billiards table annimation rendered with OpenGL.</p>
-          </a>
-          <a href="/rock-paper-scissors" id="q3" class="quadrant">
-            <div class="title">Rock Paper Scissors Game</div>
-            <img src="RPS.png" alt="Rock Paper Scissors Image">
-            <p>Classic rock paper scissors against a robot opponent.</p>
-          </a>
-          <a href="https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496" id="q4" class="quadrant">
-            <div class="title">Figma Prototype</div>
-            <img src="figma.png" alt="Figma Example Image">
-            <p>Figma prototype for a book review website.</p>
-          </a>
-          <a href="http://localhost:3000/run-weather-app" id="q5" class="quadrant">
-            <div class="title">Weather App</div>
-            <img src="weather.png" alt="Weather Dashboard Image">
-            <p>Displays weather with locational city backgrounds.</p>
-          </a>
-          <a href="http://localhost:3000/run-android" id="q6" class="quadrant">
-            <div class="title">Android Studio Project</div>
-            <p>Android Kotlin mobile app emulation.</p>
-          </a>
-        </div>
-      </body>
-    </html>
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Portfolio</title>
+    <style>
+      /* Base Styles */
+      body, html {
+        height: 100%;
+        margin: 0;
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+  
+      .container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-gap: 20px;
+        padding: 60px;
+        max-width: 1200px;
+        margin: auto;
+      }
+  
+      .quadrant {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        height: 250px;
+        position: relative;
+      }
+  
+      .quadrant:hover {
+        transform: translateY(-8px);
+        box-shadow: 0px 12px 20px rgba(0, 0, 0, 0.3);
+      }
+  
+      .title {
+        position: absolute;
+        top: 20px;
+        font-size: 20px;
+        font-weight: 600;
+        width: 100%;
+        text-align: center;
+      }
+  
+      .toggle-switch {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+      }
+  
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+      }
+  
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+  
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 34px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+      }
+  
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+      }
+  
+      input:checked + .slider {
+        background-color: #66bb6a;
+      }
+  
+      input:checked + .slider:before {
+        transform: translateX(20px);
+      }
+  
+      /* Dark Mode */
+      body.dark-mode {
+        background-color: #1e1e2e;
+        color: #e0e0e0;
+      }
+  
+      .dark-mode .quadrant {
+        color: #ffffff;
+        border: 1px solid #444444;
+      }
+  
+      /* Light Mode */
+      body.light-mode {
+        background-color: #f2f2f5;
+       
+      }
+
+      /* Light Mode Title and Description Text Colors */
+      .light-mode .quadrant .title {
+        color: #1a1a1a; /* Slightly subdued black for titles */
+      }
+      
+      .light-mode .quadrant p {
+        color: #4d4d4d; /* More muted black for descriptions */
+      }
+      
+      /* Dark Mode Title and Description Text Colors */
+      .dark-mode .quadrant .title p {
+        color: #f2f2f2; /* Slightly off-white for titles */
+      }
+      
+      
+  
+      .light-mode #q1 { background-color: #d7ebff; } /* Light Blue */
+      .light-mode #q2 { background-color: #ffdad7; } /* Light Coral */
+      .light-mode #q3 { background-color: #ede4ff; } /* Light Purple */
+      .light-mode #q4 { background-color: #e6f5e6; } /* Light Green */
+      .light-mode #q5 { background-color: #fff5d7; } /* Light Peach */
+      .light-mode #q6 { background-color: #d7f5f0; } /* Light Cyan */
+      .light-mode #q7 { background-color: #FFEAD7; } /* Light orange */
+  
+      /* Dark Mode Colors */
+      .dark-mode #q1 { background-color: #007bff; } /* Deep Steel Blue */
+      .dark-mode #q2 { background-color: #D14141; } /* Muted Deep Red */
+      .dark-mode #q3 { background-color: #6A4CA6; } /* Muted Royal Purple */
+      .dark-mode #q4 { background-color: #4CAF50; } /* Muted Forest Green */
+      .dark-mode #q5 { background-color: #F4C542; } /* Muted yellow */
+      .dark-mode #q6 { background-color: #26A69A; } /* Muted Teal Green */
+      .dark-mode #q7 { background-color: #FFB74D; } /* Muted Mustard Brown */
+  
+      
+      .light-mode #q3 img {
+        filter: brightness(0.0);
+      }
+      .dark-mode #q3 img {
+        filter: brightness(1.0);
+      }
+
+    
+
+   
+     
+  
+      .quadrant img {
+        width: 70%;
+        height: 60%;
+        object-fit: contain;
+        margin-top: 20px;
+      }
+      
+      .quadrant p {
+        font-size: 14px;
+        margin-top: 15px;
+      }
+  
+      h1 {
+        text-align: center;
+        font-size: 36px;
+        margin-bottom: 40px;
+        padding-top: 20px;
+      }
+    </style>
+  </head>
+  <body class="light-mode">
+    <div class="toggle-switch">
+      <label class="switch">
+        <input type="checkbox" id="mode-toggle" onclick="toggleMode()">
+        <span class="slider"></span>
+      </label>
+    </div>
+    
+    <h1>Dynamic Portfolio</h1>
+  
+    <div class="container">
+      <a href="http://localhost:5002" id="q1" class="quadrant">
+        <div class="title">Exercise tracker API</div>
+        <img src="www.png" alt="Exercise Tracker Image">
+        <p>A full stack REST API website for tracking workouts</p>
+      </a>
+      <a href="http://localhost:3000/run-final" id="q2" class="quadrant">
+        <div class="title">OpenGL graphics</div>
+        <img src="opengl.png" alt="OpenGL Animation Image">
+        <p>Billiards table animation rendered with OpenGL</p>
+      </a>
+      <a href="/rock-paper-scissors" id="q3" class="quadrant">
+        <div class="title">Rock Paper Scissors</div>
+        <img src="RPS.png" alt="Rock Paper Scissors Image">
+        <p>Classic rock paper scissors against a robot opponent</p>
+      </a>
+      <a href="https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496" id="q4" class="quadrant">
+        <div class="title">Figma prototype</div>
+        <img src="figma.png" alt="Figma Example Image">
+        <p>Figma prototype for a book review website</p>
+      </a>
+      <a href="http://localhost:3000/run-weather-app" id="q5" class="quadrant">
+        <div class="title">Weather app</div>
+        <img src="weather.png" alt="Weather Dashboard Image">
+        <p>Displays weather with locational city backgrounds</p>
+      </a>
+      <a href="#" id="q6" class="quadrant">
+        <div class="title">Mobile app</div>
+        <p>Android Kotlin mobile app emulation</p>
+      </a>
+      <a href="./video.mov" id="q7" class="quadrant">
+        <div class="title">Video Project</div>
+        <img src="video.png" alt="Video Project Image">
+        <p>Video example</p>
+      </a>
+    </div>
+  
+    <script>
+      function toggleMode() {
+        document.body.classList.toggle('dark-mode');
+        document.body.classList.toggle('light-mode');
+      }
+    </script>
+  </body>
+  </html>
+  
+  
   `);
 });
 
