@@ -415,11 +415,11 @@ app.get('/', (req, res) => {
 
 
       #q3 img {
-        width: 250px; 
-        height: auto; 
-        margin-top: 30%;
+        width: 105%; 
+  
+        
       }
-     
+    
   
       .quadrant img {
         width: 70%;
@@ -465,7 +465,7 @@ app.get('/', (req, res) => {
       <a href="/rock-paper-scissors" id="q3" class="quadrant">
         <div class="title">Rock Paper Scissors <br> Lizard Spock</div>
         <img src="RPS.png" alt="Rock Paper Scissors Image">
-        <p>A twist on the classic game Rock Paper Scissors played against a robot opponent</p>
+        <p>A twist on Rock Paper Scissors played against a robot opponent</p>
       </a>
       <a href="https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496" id="q4" class="quadrant">
         <div class="title">Figma prototype</div>
