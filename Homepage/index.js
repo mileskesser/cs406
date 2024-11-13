@@ -10,13 +10,19 @@ const projects = [
   { name: 'Exercise Tracker App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/exercise-app/backend/server.js', port: 5002 },
   { name: 'Rock Paper Scissors Game', url: '/rock-paper-scissors' },
   { name: 'Figma Example', url: 'https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496' },
-  { name: 'Weather App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/weatherApp/backend/server.js', port: 5008 }
+  { name: 'Weather App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/weatherApp/backend/server.js', port: 5008 },
+  { name: 'Game', url: '/game' }
 ];
 
 app.use(express.static(path.join(__dirname, '../')));
 
 app.get('/rock-paper-scissors', (req, res) => {
   res.sendFile(path.join(__dirname, '../rock_paper_scissors.html'));  
+});
+
+app.get('/game', (req, res) => {
+  // Serve the game HTML file from the root of the directory
+  res.sendFile(path.join(__dirname, '../game.html'));
 });
 
 app.get('/run-final', (req, res) => {
@@ -407,14 +413,12 @@ app.get('/', (req, res) => {
         filter: brightness(1.0);
       }
 
+
       #q3 img {
-        width: 120px; /* Adjust width as needed */
-        height: auto;
-        margin-top: 20%; 
-
-    }
-
-   
+        width: 250px; 
+        height: auto; 
+        margin-top: 30%;
+      }
      
   
       .quadrant img {
@@ -477,8 +481,12 @@ app.get('/', (req, res) => {
         <div class="title">Mobile app</div>
         <img src="app.png" alt="Video Project Image">
         <p>Kotlin Android mobile app video demonstration</p>
-       
       </a>
+      <a href="/game" id="q7" class="quadrant">
+      <div class="title">Game</div>
+      <img src="game.png" alt="Game Image">
+      <p>First person maze game</p>
+    </a>
     </div>
   
     <script>
