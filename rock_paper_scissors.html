@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rock Paper Scissors - Best of 3</title>
+    
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,6 +23,33 @@
             color: #4CAF50;
             margin: 0.5em 0;
         }
+
+        .rules {
+        max-width: 600px;
+        font-size: 1.2em;
+        color: #555;
+        background-color: #fff;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 1em;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .rules-columns {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .rules-columns ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        
+    }
+
+    .rules-columns li {
+        margin-bottom: 8px;
+    }
 
         .instructions {
             font-size: 1.8em;
@@ -97,7 +124,7 @@
         }
 
         #overlayText {
-            font-size: 2.5em; /* Larger font size for overlay text */
+            font-size: 2.5em;
             animation: fadein 1s;
             line-height: 1.6;
             margin-bottom: 20px;
@@ -118,7 +145,7 @@
         #congratsMessage, #robotWinsText {
             font-size: 2em;
             margin-bottom: 20px;
-            color: #FFD700; /* Gold color for the congratulatory message */
+            color: #FFD700; 
         }
 
         #playAgainBtn, #robotPlayAgainBtn {
@@ -144,12 +171,32 @@
 </head>
 <body>
 
-    <h1>Rock Paper Scissors - Best of 3</h1>
-    <p class="instructions">Choose Rock, Paper, or Scissors to start the game.</p>
+    <h1>Rock Paper Scissors Lizard Spock</h1>
+
+    <div class="rules">
+        <h2>Rules</h2>
+        <div class="rules-columns">
+            <ul>
+                <li><strong>Scissors</strong> cuts paper</li>
+                <li><strong>Paper</strong> covers rock</li>
+                <li><strong>Rock</strong> crushes lizard</li>
+                <li><strong>Lizard</strong> poisons Spock</li>
+                <li><strong>Spock</strong> smashes scissors</li>
+            </ul>
+            <ul>
+                <li><strong>Spock</strong> vaporizes rock</li>
+                <li><strong>Scissors</strong> decapitates lizard</li>
+                <li><strong>Paper</strong> disproves Spock</li>
+                <li><strong>Rock</strong> crushes scissors</li>
+                <li><strong>Lizard</strong> eats paper</li>
+            </ul>
+        </div>
+    </div>
 
     <div class="score">
         Your Score: <span id="playerScore">0</span> | Robot Score: <span id="robotScore">0</span>
     </div>
+
 
     <div class="choices">
         <div class="choice" id="rock">
@@ -164,17 +211,24 @@
             <img src="./RPS-pngs/scissors.png" alt="Scissors">
             <p>Scissors</p>
         </div>
+        <div class="choice" id="lizard">
+            <img src="./RPS-pngs/lizard.png" alt="Lizard">
+            <p>Lizard</p>
+        </div>
+        <div class="choice" id="spock">
+            <img src="./RPS-pngs/spock.png" alt="Spock">
+            <p>Spock</p>
+        </div>
     </div>
 
     <div class="result" id="resultText">Choose your move to play!</div>
     <div id="loadingIcon">🤖</div>
 
-    <!-- Overlay for Round Results -->
+
     <div id="overlay">
         <div id="overlayText"></div>
     </div>
 
-    <!-- Congratulations Overlay with Gold Medal -->
     <div id="congratsOverlay">
         <div id="congratsContent">
             <img id="goldMedal" src="./RPS-pngs/gold-medal.png" alt="Gold Medal">
@@ -183,7 +237,6 @@
         </div>
     </div>
 
-    <!-- Robot Wins Overlay -->
     <div id="robotWinsOverlay">
         <div id="robotWinsContent">
             <div id="robotWinsText">Robot Wins! Better Luck Next Time!</div>
@@ -195,7 +248,7 @@
         let playerScore = 0;
         let robotScore = 0;
 
-        const choices = ["rock", "paper", "scissors"];
+        const choices = ["rock", "paper", "scissors", "lizard", "spock"];
         const choiceElements = document.querySelectorAll('.choice');
         const resultText = document.getElementById('resultText');
         const loadingIcon = document.getElementById('loadingIcon');
@@ -228,30 +281,29 @@
 
         function playRound(playerChoice) {
             const robotChoice = choices[Math.floor(Math.random() * choices.length)];
-            const winner = determineWinner(playerChoice, robotChoice);
+            const resultMessage = determineWinner(playerChoice, robotChoice);
 
-            if (winner === "you") {
+            if (resultMessage.includes("You win")) {
                 playerScore++;
-            } else if (winner === "robot") {
+            } else if (resultMessage.includes("Robot wins")) {
                 robotScore++;
             }
 
             document.getElementById('playerScore').innerText = playerScore;
             document.getElementById('robotScore').innerText = robotScore;
 
-            showOverlay(winner, playerChoice, robotChoice);
+            showOverlay(resultMessage);
 
             checkGameOver();
         }
 
-        function showOverlay(winner, playerChoice, robotChoice) {
-            overlayText.innerHTML = `You chose <strong>${capitalize(playerChoice)}</strong>. Robot chose <strong>${capitalize(robotChoice)}</strong>.<br><br>`;
-            overlayText.innerHTML += winner === "tie" ? "It's a Tie!" : winner === "you" ? "You Win the Round!" : "Robot Wins the Round!";
+        function showOverlay(resultMessage) {
+            overlayText.innerHTML = resultMessage;
             overlay.style.display = "flex";
 
             setTimeout(() => {
                 overlay.style.display = "none";
-            }, 2000);
+            }, 3000);
         }
 
         function checkGameOver() {
@@ -286,20 +338,24 @@
 
         function determineWinner(player, robot) {
             if (player === robot) {
-                return "tie";
-            } else if (
-                (player === "rock" && robot === "scissors") ||
-                (player === "scissors" && robot === "paper") ||
-                (player === "paper" && robot === "rock")
-            ) {
-                return "you";
-            } else {
-                return "robot";
+                return `You chose ${player}. Robot chose ${robot}.<br><br>It's a tie!`;
             }
-        }
 
-        function capitalize(word) {
-            return word.charAt(0).toUpperCase() + word.slice(1);
+            const outcomes = {
+                rock: { scissors: "Rock crushes scissors", lizard: "Rock crushes lizard" },
+                paper: { rock: "Paper covers rock", spock: "Paper disproves Spock" },
+                scissors: { paper: "Scissors cuts paper", lizard: "Scissors decapitates lizard" },
+                lizard: { spock: "Lizard poisons Spock", paper: "Lizard eats paper" },
+                spock: { scissors: "Spock smashes scissors", rock: "Spock vaporizes rock" }
+            };
+
+            const result = outcomes[player][robot];
+
+            if (result) {
+                return `You chose ${player}. Robot chose ${robot}.<br><br>${result}.<br><br>You win this round!`;
+            } else {
+                return `You chose ${player}. Robot chose ${robot}.<br><br>${outcomes[robot][player]}.<br><br>Robot wins this round!`;
+            }
         }
     </script>
 

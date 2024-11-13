@@ -19,7 +19,7 @@ object RecommendationDataSource {
         ),
 
         "Restaurants" to listOf(
-            CityRecommendation("Cubo", "3106 SE Hawthorne Blvd, Portland, OR 97214", "Cuban joint serves up homestyle fare plus cocktails in casual, vibrant surrounds with a patio.", R.drawable.restaurant1),
+            CityRecommendation("Cubo de Cuba", "3106 SE Hawthorne Blvd, Portland, OR 97214", "Cuban joint serves up homestyle fare plus cocktails in casual, vibrant surrounds with a patio.", R.drawable.restaurant1),
             CityRecommendation("Cha Cha Cha!", "2635 NE Broadway ste 1, Portland, OR 97232", "Mini-chain taqueria & margarita bar offering locally sourced Mexican fare & some outdoor seating.", R.drawable.restaurant2),
             CityRecommendation("Baby Doll Pizza", "2835 SE Stark St, Portland, OR 97214", "Casual joint with outdoor seats offering locally sourced NY-style pies, draft beer & regional wine.", R.drawable.restaurant3),
             CityRecommendation("Zachs Shack", "4611 SE Hawthorne Blvd, Portland, OR 97215", "Laid-back restaurant/bar with spacious patio & Ping-Pong, serving beer & loaded hot dogs until late.", R.drawable.restaurant4)

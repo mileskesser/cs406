@@ -10,8 +10,7 @@ const projects = [
   { name: 'Exercise Tracker App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/exercise-app/backend/server.js', port: 5002 },
   { name: 'Rock Paper Scissors Game', url: '/rock-paper-scissors' },
   { name: 'Figma Example', url: 'https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496' },
-  { name: 'Weather App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/weatherApp/backend/server.js', port: 5008 }, 
-  { name: 'Video Project', url: '/play-video' }
+  { name: 'Weather App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/weatherApp/backend/server.js', port: 5008 }
 ];
 
 app.use(express.static(path.join(__dirname, '../')));
@@ -216,7 +215,7 @@ app.get('/play-video', (req, res) => {
     </head>
     <body>
       <div class="video-container">
-        <h1>Video Test</h1>
+        <h2>Click the video below to watch</h2>
         <video controls>
           <source src="/video.mov" type="video/mp4">
           Your browser does not support the video tag.
@@ -408,7 +407,12 @@ app.get('/', (req, res) => {
         filter: brightness(1.0);
       }
 
-    
+      #q3 img {
+        width: 120px; /* Adjust width as needed */
+        height: auto;
+        margin-top: 20%; 
+
+    }
 
    
      
@@ -455,9 +459,9 @@ app.get('/', (req, res) => {
         <p>Billiards table animation rendered with OpenGL</p>
       </a>
       <a href="/rock-paper-scissors" id="q3" class="quadrant">
-        <div class="title">Rock Paper Scissors</div>
+        <div class="title">Rock Paper Scissors <br> Lizard Spock</div>
         <img src="RPS.png" alt="Rock Paper Scissors Image">
-        <p>Classic rock paper scissors against a robot opponent</p>
+        <p>A twist on the classic game Rock Paper Scissors played against a robot opponent</p>
       </a>
       <a href="https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496" id="q4" class="quadrant">
         <div class="title">Figma prototype</div>
@@ -469,14 +473,11 @@ app.get('/', (req, res) => {
         <img src="weather.png" alt="Weather Dashboard Image">
         <p>Displays weather with locational city backgrounds</p>
       </a>
-      <a href="#" id="q6" class="quadrant">
+      <a href="/play-video" id="q6" class="quadrant">
         <div class="title">Mobile app</div>
-        <p>Android Kotlin mobile app emulation</p>
-      </a>
-      <a href="./video.mov" id="q7" class="quadrant">
-        <div class="title">Video Project</div>
-        <img src="video.png" alt="Video Project Image">
-        <p>Video example</p>
+        <img src="app.png" alt="Video Project Image">
+        <p>Kotlin Android mobile app video demonstration</p>
+       
       </a>
     </div>
   
