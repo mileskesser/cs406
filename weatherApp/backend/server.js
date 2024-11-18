@@ -5,20 +5,20 @@ const cors = require('cors');
 const app = express();
 
 const WEATHER_API_KEY = 'fdc3e2bb687ce2ad92a928fdff48dc2b';
-const UNSPLASH_ACCESS_KEY = 'EYJcNJI1R9CylWP73O737gm7OHDl0dN2fURzD3tbsrg'; // Replace with your Unsplash Access Key
+const UNSPLASH_ACCESS_KEY = 'EYJcNJI1R9CylWP73O737gm7OHDl0dN2fURzD3tbsrg'; 
 const PORT = 5008;
 
 app.use(cors());
 
 app.get('/weather', async (req, res) => {
-  const city = req.query.city || 'New York'; // Default to New York if no city is provided
+  const city = req.query.city || 'New York'; 
 
   try {
-    // Fetch weather data from OpenWeather API
+    // fetch weather from OpenWeather 
     const weatherResponse = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${WEATHER_API_KEY}`);
     const weatherData = weatherResponse.data;
 
-    // Fetch city background image from Unsplash API
+    // fetch city image from Unsplash
     const unsplashResponse = await axios.get(`https://api.unsplash.com/search/photos`, {
       params: {
         query: city,
@@ -36,11 +36,10 @@ app.get('/weather', async (req, res) => {
       }
       const prediction = JSON.parse(stdout);
 
-      // Convert temperatures from Kelvin to Fahrenheit
       const tempFahrenheit = ((weatherData.main.temp - 273.15) * 9/5 + 32).toFixed(1);
       const feelsLikeFahrenheit = ((weatherData.main.feels_like - 273.15) * 9/5 + 32).toFixed(1);
 
-      // Render HTML response with weather data, background image, and a search form
+ 
       res.send(`
         <html>
           <head>
