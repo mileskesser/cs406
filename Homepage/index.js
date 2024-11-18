@@ -448,6 +448,7 @@ app.get('/', (req, res) => {
         <span class="slider"></span>
       </label>
     </div>
+
     
     <h1>Dynamic Portfolio</h1>
   
