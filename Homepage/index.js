@@ -21,7 +21,6 @@ app.get('/rock-paper-scissors', (req, res) => {
 });
 
 app.get('/game', (req, res) => {
-  // Serve the game HTML file from the root of the directory
   res.sendFile(path.join(__dirname, '../game.html'));
 });
 
