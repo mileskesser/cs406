@@ -5,13 +5,16 @@ const path = require('path');
 const app = express();
 const port = 3000;
 
+
 const projects = [
   { name: 'OpenGL Animation', type: 'cpp', makePath: '../OpenGL', executable: './sample', port: 4000 },
   { name: 'Exercise Tracker App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/exercise-app/backend/server.js', port: 5002 },
   { name: 'Rock Paper Scissors Game', url: '/rock-paper-scissors' },
   { name: 'Figma Example', url: 'https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496' },
   { name: 'Weather App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/weatherApp/backend/server.js', port: 5008 },
-  { name: 'Game', url: '/game' }
+  { name: 'Game', url: '/game' },
+  { name: 'Alien Game', url: '/alien' }
+
 ];
 
 app.use(express.static(path.join(__dirname, '../')));
@@ -23,6 +26,16 @@ app.get('/rock-paper-scissors', (req, res) => {
 app.get('/game', (req, res) => {
   res.sendFile(path.join(__dirname, '../game.html'));
 });
+
+
+app.get('/alien', (req, res) => {
+  res.sendFile(path.join(__dirname, '../alien.html'));
+});
+
+
+
+
+
 
 app.get('/run-final', (req, res) => {
   const project = projects.find(p => p.name === 'OpenGL Animation');
@@ -394,6 +407,11 @@ app.get('/', (req, res) => {
       .light-mode #q5 { background-color: #fff5d7; } /* Light Peach */
       .light-mode #q6 { background-color: #d7f5f0; } /* Light Cyan */
       .light-mode #q7 { background-color: #FFEAD7; } /* Light orange */
+     
+      .light-mode #q8 { background-color: #fff0f5; } /* Lavender Blush */
+     
+      
+
   
       /* Dark Mode Colors */
       .dark-mode #q1 { background-color: #007bff; } /* Deep Steel Blue */
@@ -403,6 +421,7 @@ app.get('/', (req, res) => {
       .dark-mode #q5 { background-color: #F4C542; } /* Muted yellow */
       .dark-mode #q6 { background-color: #26A69A; } /* Muted Teal Green */
       .dark-mode #q7 { background-color: #FFB74D; } /* Muted Mustard Brown */
+      .dark-mode #q8 { background-color: #8B0000; } /* Dark Red */
   
       
       .light-mode #q3 img {
@@ -483,10 +502,16 @@ app.get('/', (req, res) => {
         <p>Kotlin Android mobile app video demonstration</p>
       </a>
       <a href="/game" id="q7" class="quadrant">
-      <div class="title">Game</div>
+      <div class="title">Maze Game</div>
       <img src="game.png" alt="Game Image">
       <p>First person maze game</p>
     </a>
+    <a href="/alien" id="q8" class="quadrant">
+  <div class="title">Alien Game</div>
+  <img src="alien.png" alt="Alien Image">
+  <p>Arcade style laser dodging game</p>
+</a>
+
     </div>
   
     <script>

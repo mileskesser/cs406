@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alien Attack Avoidance</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: black;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const SCREEN_WIDTH = canvas.width;
+    const SCREEN_HEIGHT = canvas.height;
+
+    const colors = {
+      WHITE: "#FFFFFF",
+      BLACK: "#000000",
+      RED: "#FF0000",
+      BLUE: "#0000FF",
+      GREEN: "#00FF00",
+      YELLOW: "#FFFF00",
+      PURPLE: "#800080"
+    };
+
+    const player = {
+      width: 50,
+      height: 50,
+      x: SCREEN_WIDTH / 2 - 25,
+      y: SCREEN_HEIGHT - 70,
+      speed: 7,
+      color: colors.BLUE
+    };
+
+    const aliens = [
+      { x: SCREEN_WIDTH / 4 - 50, y: 50, speed: 5, direction: 1, lasers: [], color: colors.GREEN },
+      { x: SCREEN_WIDTH / 2 - 50, y: 50, speed: 6, direction: -1, lasers: [], color: colors.YELLOW },
+      { x: (3 * SCREEN_WIDTH) / 4 - 50, y: 50, speed: 7, direction: 1, lasers: [], color: colors.PURPLE }
+    ];
+
+    const laser = {
+      width: 10,
+      height: 20,
+      speed: 15,
+      color: colors.RED
+    };
+
+    let score = 0;
+    let gameOver = false;
+
+    function drawPlayer() {
+      ctx.fillStyle = player.color;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
+
+    function drawAlien(alien) {
+      ctx.fillStyle = alien.color;
+      ctx.beginPath();
+      ctx.ellipse(alien.x + 50, alien.y + 25, 50, 25, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = colors.WHITE;
+      ctx.fillRect(alien.x + 20, alien.y + 45, 60, 10);
+    }
+
+    function drawLaser(laser) {
+      ctx.fillStyle = laser.color;
+      ctx.fillRect(laser.x, laser.y, laser.width, laser.height);
+    }
+
+    function drawScore() {
+      ctx.fillStyle = colors.WHITE;
+      ctx.font = "24px Arial";
+      ctx.fillText(`Score: ${score}`, 20, 40);
+    }
+
+    function gameOverScreen() {
+      ctx.fillStyle = colors.BLACK;
+      ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+      ctx.fillStyle = colors.WHITE;
+      ctx.font = "36px Arial";
+      ctx.fillText("Game Over! Press R to Restart or Q to Quit", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2);
+    }
+
+    function update() {
+      if (gameOver) return;
+
+      aliens.forEach((alien) => {
+        alien.x += alien.speed * alien.direction;
+        if (alien.x <= 0 || alien.x >= SCREEN_WIDTH - 100) {
+          alien.direction *= -1;
+        }
+
+        if (Math.random() < 0.02) {
+          alien.lasers.push({ x: alien.x + 50 - 5, y: alien.y + 50 });
+        }
+
+        alien.lasers.forEach((laserObj, index) => {
+          laserObj.y += laser.speed;
+          if (laserObj.y > SCREEN_HEIGHT) {
+            alien.lasers.splice(index, 1);
+            score++;
+          } else if (
+            laserObj.x < player.x + player.width &&
+            laserObj.x + laser.width > player.x &&
+            laserObj.y < player.y + player.height &&
+            laserObj.y + laser.height > player.y
+          ) {
+            gameOver = true;
+          }
+        });
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+      drawPlayer();
+      aliens.forEach((alien) => {
+        drawAlien(alien);
+        alien.lasers.forEach(drawLaser);
+      });
+      drawScore();
+    }
+
+    function loop() {
+      if (!gameOver) {
+        update();
+        draw();
+      } else {
+        gameOverScreen();
+      }
+      requestAnimationFrame(loop);
+    }
+
+    window.addEventListener("keydown", (e) => {
+      if (!gameOver) {
+        if (e.key === "ArrowLeft" && player.x > 0) {
+          player.x -= player.speed;
+        }
+        if (e.key === "ArrowRight" && player.x < SCREEN_WIDTH - player.width) {
+          player.x += player.speed;
+        }
+      } else {
+        if (e.key === "r") {
+          score = 0;
+          aliens.forEach((alien) => (alien.lasers = []));
+          player.x = SCREEN_WIDTH / 2 - player.width / 2;
+          gameOver = false;
+        }
+        if (e.key === "q") {
+          window.close();
+        }
+      }
+    });
+
+    loop();
+  </script>
+</body>
+</html>
