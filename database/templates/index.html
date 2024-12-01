@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Database Visualizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Dark Mode Styling Consistent Across All Pages */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #f5f5f5;
+        }
+        header {
+            background-color: #1e1e1e;
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 2px solid #333;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            color: #d1d1d1;
+        }
+        main {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .input-container label {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #f5f5f5;
+        }
+        .input-container textarea {
+            width: 100%;
+            font-size: 1em;
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 5px;
+            color: #f5f5f5;
+            padding: 10px;
+            resize: none; /* Prevent manual resizing */
+            box-sizing: border-box;
+            overflow: hidden; /* Hide scrollbars */
+            transition: height 0.2s ease; /* Smooth height adjustment */
+        }
+        button {
+            margin-top: 10px;
+            width: 100%;
+            padding: 12px;
+            font-size: 1em;
+            color: #f5f5f5;
+            background-color: #3a3a3a;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        button:hover {
+            background-color: #4a4a4a;
+            transform: scale(1.02);
+        }
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 5px;
+        }
+        .result-container h2 {
+            color: #f5f5f5;
+            margin-top: 0;
+        }
+        .result-container pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #d1d1d1;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+        footer a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 20px;
+            font-size: 1em;
+            color: #f5f5f5;
+            background-color: #3a3a3a;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        footer a:hover {
+            background-color: #4a4a4a;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Database Visualizer</h1>
+    </header>
+    <main>
+        <form method="POST" action="/execute_query">
+            <div class="input-container">
+                <label for="query">Enter SQL Query:</label>
+                <textarea id="query" name="query" rows="4" placeholder="Type your SQL query here..." oninput="autoExpand(this)"></textarea>
+                <button type="submit">Execute Query</button>
+            </div>
+        </form>
+
+        {% if query %}
+        <div class="result-container">
+            <h2>Query Executed Successfully:</h2>
+            <pre>{{ query }}</pre>
+        </div>
+        {% endif %}
+    </main>
+    <footer>
+        <a href="/view_tables">View Database Tables</a>
+    </footer>
+
+    <script>
+        // Automatically expand the textarea as the user types
+        function autoExpand(textarea) {
+            textarea.style.height = 'auto'; // Reset height to calculate new height
+            textarea.style.height = textarea.scrollHeight + 'px'; // Set height based on scrollHeight
+        }
+    </script>
+</body>
+</html>

@@ -1,6 +1,7 @@
-const { spawn } = require('child_process');
+const { spawn, execSync} = require('child_process');
 const express = require('express');
 const path = require('path');
+const { exec } = require('child_process');
 
 const app = express();
 const port = 3000;
@@ -13,11 +14,64 @@ const projects = [
   { name: 'Figma Example', url: 'https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496' },
   { name: 'Weather App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/weatherApp/backend/server.js', port: 5008 },
   { name: 'Game', url: '/game' },
-  { name: 'Alien Game', url: '/alien' }
+  { name: 'Alien Game', url: '/alien' },
+  { name: 'Database Visualizer', path: '/Users/mileskesser/Desktop/dynamic-portfolio/database-copy/app.py', port: 5009 }
 
 ];
 
 app.use(express.static(path.join(__dirname, '../')));
+
+// Ensure dependencies
+function ensureDependencies(dependency) {
+  try {
+    require.resolve(dependency);
+    console.log(`${dependency} is already installed.`);
+  } catch (err) {
+    console.log(`${dependency} is not installed. Installing now...`);
+    execSync(`npm install ${dependency}`, { stdio: 'inherit' });
+    console.log(`${dependency} has been successfully installed.`);
+  }
+}
+
+// Ensure required dependencies are installed
+ensureDependencies('sqlite3');
+
+// Route for database visualizer
+
+
+app.get('/run-database', (req, res) => {
+  const project = projects.find(p => p.name === 'Database Visualizer');
+  
+  if (project && project.path) {
+      console.log(`Starting ${project.name} on port ${project.port}...`);
+
+      // Run the Python script
+      const pythonProcess = spawn('python3', [project.path]);
+
+      pythonProcess.stdout.on('data', (data) => {
+          console.log(`${project.name} output: ${data}`);
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+          console.error(`${project.name} error: ${data}`);
+      });
+
+      pythonProcess.on('close', (code) => {
+          console.log(`${project.name} process exited with code ${code}`);
+      });
+
+      // Redirect to the appropriate port
+      res.redirect(`http://localhost:${project.port}`);
+  } else {
+      res.status(404).send('<h1>Database Visualizer project not found!</h1>');
+  }
+});
+
+
+
+
+
+
 
 app.get('/rock-paper-scissors', (req, res) => {
   res.sendFile(path.join(__dirname, '../rock_paper_scissors.html'));  
@@ -31,9 +85,6 @@ app.get('/game', (req, res) => {
 app.get('/alien', (req, res) => {
   res.sendFile(path.join(__dirname, '../alien.html'));
 });
-
-
-
 
 
 
@@ -81,87 +132,6 @@ app.get('/run-final', (req, res) => {
   }
 });
 
-// New route to build and run the Android Project (A3) in an emulator
-app.get('/run-android', (req, res) => {
-  const projectPath = '/Users/mileskesser/Desktop/dynamic-portfolio/A3';
-  const emulatorName = 'Pixel 8 Pro API 35';
-  const javaHomePath = '/Library/Java/JavaVirtualMachines/jdk-17.0.1.jdk/Contents/Home'; // Replace with the correct path
-
-
-  console.log(`Building Android project at ${projectPath}...`);
-
-  // Step 1: Build the project with Gradle
-  const gradleBuild = spawn('./gradlew', ['assembleDebug'], {
-    cwd: projectPath,
-    shell: true,
-    env: { ...process.env, JAVA_HOME: javaHomePath } // Use actual Java path
-  });
-
-  gradleBuild.stdout.on('data', (data) => {
-    console.log(`Gradle build output: ${data}`);
-  });
-
-  gradleBuild.stderr.on('data', (data) => {
-    console.error(`Gradle build error: ${data}`);
-  });
-
-  gradleBuild.on('close', (code) => {
-    if (code === 0) {
-      console.log('Build successful, launching emulator...');
-
-      // Step 2: Start the emulator
-      const emulatorProcess = spawn('emulator', ['-avd', emulatorName], {
-        detached: true,
-        stdio: 'ignore'
-      });
-
-      emulatorProcess.unref();
-
-      setTimeout(() => {
-        // Step 3: Install and run the APK in the emulator
-        const apkPath = path.join(projectPath, 'app/build/outputs/apk/debug/app-debug.apk');
-        const installProcess = spawn('adb', ['-s', 'emulator-5554', 'install', '-r', apkPath]);
-
-        installProcess.stdout.on('data', (data) => {
-          console.log(`Install output: ${data}`);
-        });
-
-        installProcess.stderr.on('data', (data) => {
-          console.error(`Install error: ${data}`);
-        });
-
-        installProcess.on('close', (code) => {
-          if (code === 0) {
-            console.log('APK installed, launching the app...');
-
-            const launchProcess = spawn('adb', ['-s', 'emulator-5554', 'shell', 'monkey', '-p', 'com.example.a3', '-c', 'android.intent.category.LAUNCHER', '1']);
-
-            launchProcess.stdout.on('data', (data) => {
-              console.log(`Launch output: ${data}`);
-            });
-
-            launchProcess.stderr.on('data', (data) => {
-              console.error(`Launch error: ${data}`);
-            });
-
-            launchProcess.on('close', (code) => {
-              if (code === 0) {
-                console.log('App launched successfully!');
-                res.send('<h1>Android Project A3 is running in the emulator!</h1>');
-              } else {
-                res.send('<h1>Failed to launch the app in the emulator.</h1>');
-              }
-            });
-          } else {
-            res.send('<h1>Failed to install the APK in the emulator.</h1>');
-          }
-        });
-      }, 15000); // Wait for the emulator to boot up before installing APK
-    } else {
-      res.send('<h1>Gradle build failed.</h1>');
-    }
-  });
-});
 
 // Route to directly launch the Weather App on port 5008
 app.get('/run-weather-app', (req, res) => {
@@ -180,6 +150,8 @@ app.get('/run-weather-app', (req, res) => {
   }
 });
 
+/*
+
 
 projects.forEach((project) => {
   if (project.path && project.type !== 'cpp') {
@@ -197,7 +169,11 @@ projects.forEach((project) => {
       console.log(`${project.name} process exited with code ${code}`);
     });
   }
+
+  
 });
+
+*/
 
 // Route to serve the video player page
 app.get('/play-video', (req, res) => {
@@ -511,6 +487,12 @@ app.get('/', (req, res) => {
   <img src="alien.png" alt="Alien Image">
   <p>Arcade style laser dodging game</p>
 </a>
+
+<a href="/run-database" id="q9" class="quadrant">
+        <div class="title">Database Visualizer</div>
+        <p>Interactive SQL database viewer</p>
+      </a>
+
 
     </div>
   
