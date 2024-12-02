@@ -44,14 +44,15 @@ def execute_query():
         if query.strip().lower().startswith("select"):
             result = cursor.fetchall()
             conn.close()
-            return render_template('index.html', query=query, result=result)
+            return render_template('index.html', message="Query executed successfully!", success=True, query=query, result=result)
         else:
             conn.commit()
             conn.close()
-            return render_template('index.html', query=query, result="Query executed successfully.")
+            return render_template('index.html', message="Query executed successfully!", success=True)
     except Exception as e:
         conn.close()
-        return render_template('index.html', query=query, result=f"Error: {str(e)}")
+        return render_template('index.html', message=f"Query failed. Error: {str(e)}", success=False)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5009, debug=True)

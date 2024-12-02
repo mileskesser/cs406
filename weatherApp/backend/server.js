@@ -11,20 +11,20 @@ const PORT = 5008;
 app.use(cors());
 
 app.get('/weather', async (req, res) => {
-  const city = req.query.city || 'New York'; 
+  const city = req.query.city || 'New York';
 
   try {
-    // fetch weather from OpenWeather 
+    // Fetch weather from OpenWeather
     const weatherResponse = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${WEATHER_API_KEY}`);
     const weatherData = weatherResponse.data;
 
-    // fetch city image from Unsplash
+    // Fetch city image from Unsplash
     const unsplashResponse = await axios.get(`https://api.unsplash.com/search/photos`, {
       params: {
         query: city,
         client_id: UNSPLASH_ACCESS_KEY,
-        per_page: 1
-      }
+        per_page: 1,
+      },
     });
 
     const imageUrl = unsplashResponse.data.results[0]?.urls?.regular || '';
@@ -34,12 +34,12 @@ app.get('/weather', async (req, res) => {
         console.error(`Prediction error: ${error.message}`);
         return res.status(500).send('Error running prediction');
       }
+
       const prediction = JSON.parse(stdout);
 
-      const tempFahrenheit = ((weatherData.main.temp - 273.15) * 9/5 + 32).toFixed(1);
-      const feelsLikeFahrenheit = ((weatherData.main.feels_like - 273.15) * 9/5 + 32).toFixed(1);
+      const tempFahrenheit = ((weatherData.main.temp - 273.15) * 9 / 5 + 32).toFixed(1);
+      const feelsLikeFahrenheit = ((weatherData.main.feels_like - 273.15) * 9 / 5 + 32).toFixed(1);
 
- 
       res.send(`
         <html>
           <head>
@@ -161,7 +161,12 @@ app.get('/weather', async (req, res) => {
     });
   } catch (error) {
     console.error('Weather API error:', error.response?.data || error.message);
-    res.status(500).send(`<h1>Error fetching weather data</h1><p>${error.response?.data?.message || error.message}</p>`);
+    res.send(`
+      <script>
+        alert("Error: ${error.response?.data?.message || 'City not found. Please check the city name and try again.'}");
+        window.history.back();
+      </script>
+    `);
   }
 });
 

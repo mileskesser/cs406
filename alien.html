@@ -13,10 +13,48 @@
     canvas {
       display: block;
     }
+    .end-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.9);
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      z-index: 1000;
+      visibility: hidden;
+    }
+    .end-screen.visible {
+      visibility: visible;
+    }
+    .end-screen button {
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      font-size: 18px;
+      margin: 10px;
+      cursor: pointer;
+    }
+    .end-screen button:hover {
+      background-color: #666;
+    }
   </style>
 </head>
 <body>
   <canvas id="gameCanvas"></canvas>
+  <div id="endScreen" class="end-screen">
+    <h1 id="endMessage">Game Over</h1>
+    <button id="restartButton">Restart</button>
+    <button id="quitButton">Quit</button>
+  </div>
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
@@ -26,46 +64,70 @@
     const SCREEN_WIDTH = canvas.width;
     const SCREEN_HEIGHT = canvas.height;
 
-    const colors = {
-      WHITE: "#FFFFFF",
-      BLACK: "#000000",
-      RED: "#FF0000",
-      BLUE: "#0000FF",
-      GREEN: "#00FF00",
-      YELLOW: "#FFFF00",
-      PURPLE: "#800080"
-    };
+    const colors = [
+      "#FF0000", "#00FF00", "#0000FF",
+      "#FFFF00", "#800080", "#FFA500",
+      "#FF69B4", "#00FFFF"
+    ];
 
     const player = {
-      width: 50,
-      height: 50,
-      x: SCREEN_WIDTH / 2 - 25,
-      y: SCREEN_HEIGHT - 70,
+      x: SCREEN_WIDTH / 2,
+      y: SCREEN_HEIGHT - 100,
       speed: 15,
       dx: 0,
-      color: colors.BLUE
+      width: 30,
+      height: 60,
+      color: "#0000FF"
     };
 
-    const aliens = [
-      { x: SCREEN_WIDTH / 4 - 50, y: 50, speed: 3, direction: 1, lasers: [], color: colors.GREEN },
-      { x: SCREEN_WIDTH / 2 - 50, y: 50, speed: 4, direction: -1, lasers: [], color: colors.YELLOW },
-      { x: (3 * SCREEN_WIDTH) / 4 - 50, y: 50, speed: 5, direction: 1, lasers: [], color: colors.PURPLE }
+    let aliens = [
+      { x: SCREEN_WIDTH / 4 - 50, y: Math.random() * 100, speed: 3, direction: 1, lasers: [], color: "#00FF00", fireRate: 0.03 }
     ];
 
     const laserTemplate = {
       width: 10,
       height: 30,
       speed: 10,
-      color: colors.RED // All lasers are now red
+      color: "#FF0000"
     };
 
-    let score = 0;
     let gameOver = false;
-    let quitGame = false;
+    let startTime = Date.now(); // Start time for score tracking
+    let alienTimer = Date.now(); // Timer for adding new aliens
+    let alienSpeedIncrement = 1.5; // Speed increment for each new alien
+
+    function getRandomColor() {
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
 
     function drawPlayer() {
-      ctx.fillStyle = player.color;
-      ctx.fillRect(player.x, player.y, player.width, player.height);
+      ctx.strokeStyle = player.color;
+      ctx.lineWidth = 3;
+
+      // Draw head
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, 15, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Draw body
+      ctx.beginPath();
+      ctx.moveTo(player.x, player.y + 15);
+      ctx.lineTo(player.x, player.y + 45);
+      ctx.stroke();
+
+      // Draw arms
+      ctx.beginPath();
+      ctx.moveTo(player.x - 15, player.y + 25);
+      ctx.lineTo(player.x + 15, player.y + 25);
+      ctx.stroke();
+
+      // Draw legs
+      ctx.beginPath();
+      ctx.moveTo(player.x, player.y + 45);
+      ctx.lineTo(player.x - 10, player.y + 65);
+      ctx.moveTo(player.x, player.y + 45);
+      ctx.lineTo(player.x + 10, player.y + 65);
+      ctx.stroke();
     }
 
     function drawAlien(alien) {
@@ -73,79 +135,84 @@
       ctx.beginPath();
       ctx.ellipse(alien.x + 50, alien.y + 25, 50, 25, 0, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = colors.WHITE;
+      ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(alien.x + 20, alien.y + 45, 60, 10);
     }
 
     function drawLaser(laser) {
-      ctx.fillStyle = laserTemplate.color; // Use red for all lasers
+      ctx.fillStyle = laserTemplate.color;
       ctx.fillRect(laser.x, laser.y, laserTemplate.width, laserTemplate.height);
     }
 
     function drawScore() {
-      ctx.fillStyle = colors.WHITE;
+      ctx.fillStyle = "#FFFFFF";
       ctx.font = "24px Arial";
-      ctx.fillText(`Score: ${score}`, 20, 40);
-    }
-
-    function drawQuitScreen() {
-      ctx.fillStyle = colors.BLACK;
-      ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-      ctx.fillStyle = colors.WHITE;
-      ctx.font = "36px Arial";
-      ctx.fillText("You quit the game. Refresh to restart.", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2);
+      const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+      ctx.fillText(`Score: ${elapsedTime}s`, 20, 40);
     }
 
     function updatePlayerPosition() {
       player.x += player.dx;
 
-      // Prevent player from moving off-screen
       if (player.x < 0) player.x = 0;
-      if (player.x > SCREEN_WIDTH - player.width) player.x = SCREEN_WIDTH - player.width;
+      if (player.x > SCREEN_WIDTH) player.x = SCREEN_WIDTH;
     }
 
-    function update() {
-      if (gameOver || quitGame) return;
+    function updateAliens() {
+      const now = Date.now();
 
-      updatePlayerPosition();
+      if (now - alienTimer >= 5000) { // Add a new alien every 5 seconds
+        const newAlien = {
+          x: Math.random() * (SCREEN_WIDTH - 100),
+          y: Math.random() * 100,
+          speed: aliens[aliens.length - 1].speed + alienSpeedIncrement, // Faster speed
+          direction: Math.random() > 0.5 ? 1 : -1,
+          lasers: [],
+          color: getRandomColor(),
+          fireRate: Math.random() * 0.05 + 0.03 // More frequent laser firing
+        };
+        aliens.push(newAlien);
+        alienTimer = now; // Reset timer
+      }
 
       aliens.forEach((alien) => {
         alien.x += alien.speed * alien.direction;
 
-        // Reverse direction on canvas edge
         if (alien.x <= 0 || alien.x >= SCREEN_WIDTH - 100) {
           alien.direction *= -1;
         }
 
-        // Randomly generate lasers
-        if (Math.random() < 0.03) {
+        if (Math.random() < alien.fireRate) {
           alien.lasers.push({ x: alien.x + 45, y: alien.y + 50 });
         }
 
         alien.lasers.forEach((laser, index) => {
           laser.y += laserTemplate.speed;
 
-          // Remove lasers if they move off-screen
           if (laser.y > SCREEN_HEIGHT) {
             alien.lasers.splice(index, 1);
-            score++;
           } else if (
-            laser.x < player.x + player.width &&
-            laser.x + laserTemplate.width > player.x &&
-            laser.y < player.y + player.height &&
-            laser.y + laserTemplate.height > player.y
+            laser.x < player.x + 15 &&
+            laser.x + laserTemplate.width > player.x - 15 &&
+            laser.y < player.y + 45 &&
+            laser.y + laserTemplate.height > player.y - 15
           ) {
             gameOver = true;
+            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            showEndScreen(`Game Over! You survived for ${elapsedTime} seconds.`);
           }
         });
       });
     }
 
+    function update() {
+      if (gameOver) return;
+
+      updatePlayerPosition();
+      updateAliens();
+    }
+
     function draw() {
-      if (quitGame) {
-        drawQuitScreen();
-        return;
-      }
       ctx.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
       drawPlayer();
       aliens.forEach((alien) => {
@@ -156,41 +223,48 @@
     }
 
     function loop() {
-      if (!gameOver && !quitGame) {
+      if (!gameOver) {
         update();
         draw();
         requestAnimationFrame(loop);
-      } else if (quitGame) {
-        drawQuitScreen();
-      } else {
-        gameOverScreen();
       }
     }
 
+    function showEndScreen(message) {
+      const endScreen = document.getElementById("endScreen");
+      document.getElementById("endMessage").textContent = message;
+      endScreen.classList.add("visible");
+    }
+
+    document.getElementById("restartButton").addEventListener("click", () => {
+      gameOver = false;
+      startTime = Date.now();
+      aliens = [
+        { x: SCREEN_WIDTH / 4 - 50, y: Math.random() * 100, speed: 3, direction: 1, lasers: [], color: "#00FF00", fireRate: 0.03 }
+      ];
+      player.x = SCREEN_WIDTH / 2;
+      const endScreen = document.getElementById("endScreen");
+      endScreen.classList.remove("visible");
+      loop();
+    });
+
+    document.getElementById("quitButton").addEventListener("click", () => {
+      const endScreen = document.getElementById("endScreen");
+      endScreen.innerHTML = "<h1>Thank you for playing!</h1>";
+    });
+
     window.addEventListener("keydown", (e) => {
-      if (!gameOver && !quitGame) {
-        if (e.key === "ArrowLeft") {
-          player.dx = -player.speed;
-        }
-        if (e.key === "ArrowRight") {
-          player.dx = player.speed;
-        }
-      } else if (gameOver) {
-        if (e.key.toLowerCase() === "r") {
-          score = 0;
-          aliens.forEach((alien) => (alien.lasers = []));
-          player.x = SCREEN_WIDTH / 2 - player.width / 2;
-          gameOver = false;
-        }
+      if (e.key === "ArrowLeft") {
+        player.dx = -player.speed;
       }
-      if (e.key.toLowerCase() === "q") {
-        quitGame = true;
+      if (e.key === "ArrowRight") {
+        player.dx = player.speed;
       }
     });
 
     window.addEventListener("keyup", (e) => {
       if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-        player.dx = 0; // Stop player movement when the key is released
+        player.dx = 0;
       }
     });
 

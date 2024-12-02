@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portland, OR Geocaching :)</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+
+        body {
+            background: linear-gradient(to bottom, #8ecae6, #219ebc);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+        }
+
+        h1 {
+            margin: 20px 0;
+            font-size: 2.5em;
+            color: #023047;
+            transition: opacity 0.5s ease;
+        }
+
+        .clue-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #023047;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .clue {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .status {
+            margin: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .status.success {
+            color: #38b000;
+        }
+
+        .status.error {
+            color: #d90429;
+        }
+
+        button {
+            background-color: #023047;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 25px;
+            font-size: 1.2em;
+            cursor: pointer;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #219ebc;
+            transform: scale(1.05);
+        }
+
+        #image-container {
+            width: 90%;
+            max-width: 600px;
+            height: 400px;
+            position: relative;
+            margin: 20px auto;
+        }
+
+        #image-container img {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            filter: blur(15px);
+            transition: filter 0.5s ease;
+        }
+
+        #image-container img.revealed {
+            filter: blur(0);
+        }
+
+        .final-screen {
+            display: none;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #023047;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <h1 id="main-title">Portland, OR Geocaching :)</h1>
+    <div class="clue-container">
+        <div class="clue">Loading clue...</div>
+        <button id="action-button" onclick="checkLocation()">Test Location Tracking</button>
+        <div class="status"></div>
+    </div>
+    <div id="image-container">
+        <img id="geocache-image" src="placeholder.jpg" alt="Geocache Location">
+    </div>
+    <div class="final-screen">
+        <h2>Congratulations!</h2>
+        <p>You've completed the geocaching scavenger hunt!</p>
+        <button onclick="restartGame()">Restart</button>
+    </div>
+    <footer>Miles Kesser 2024</footer>
+
+    <script>
+        let currentIndex = 0;
+
+        function loadClue() {
+    fetch(`/geocache/${currentIndex}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.end) {
+                showFinalScreen(data.message);
+                return;
+            }
+
+            const statusElement = document.querySelector('.status');
+            statusElement.textContent = '';
+            statusElement.className = 'status';
+
+            document.querySelector('.clue').textContent = data.clue;
+
+            const actionButton = document.getElementById('action-button');
+            actionButton.textContent = data.buttonText; // Use buttonText from the response
+
+            const image = document.getElementById('geocache-image');
+            image.src = `images/geocache-${currentIndex}.jpg`;
+            image.classList.remove('revealed');
+        });
+}
+
+
+function checkLocation() {
+    navigator.geolocation.getCurrentPosition(position => {
+        const { latitude, longitude } = position.coords;
+
+        fetch(`/check-location/${currentIndex}?lat=${latitude}&lon=${longitude}`)
+            .then(response => response.json())
+            .then(data => {
+                const statusElement = document.querySelector('.status');
+                if (data.success) {
+                    statusElement.textContent = data.message; // Display the message from the backend
+                    statusElement.className = 'status success';
+
+                    const image = document.getElementById('geocache-image');
+                    image.classList.add('revealed');
+
+                    currentIndex++;
+                    setTimeout(loadClue, 3000);
+                } else {
+                    statusElement.textContent = data.message;
+                    statusElement.className = 'status error';
+                }
+            });
+    });
+}
+
+
+        function showFinalScreen(message) {
+            document.querySelector('.clue-container').style.display = 'none';
+            document.querySelector('#image-container').style.display = 'none';
+            document.querySelector('#main-title').style.display = 'none'; // Hide the title
+
+            const finalScreen = document.querySelector('.final-screen');
+            finalScreen.style.display = 'block';
+        }
+
+        function restartGame() {
+            currentIndex = 0;
+            document.querySelector('.final-screen').style.display = 'none';
+            document.querySelector('.clue-container').style.display = 'block';
+            document.querySelector('#image-container').style.display = 'block';
+            document.querySelector('#main-title').style.display = 'block'; // Show the title
+            loadClue();
+        }
+
+        loadClue();
+    </script>
+</body>
+</html>

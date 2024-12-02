@@ -15,7 +15,9 @@ const projects = [
   { name: 'Weather App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/weatherApp/backend/server.js', port: 5008 },
   { name: 'Game', url: '/game' },
   { name: 'Alien Game', url: '/alien' },
-  { name: 'Database Visualizer', path: '/Users/mileskesser/Desktop/dynamic-portfolio/database-copy/app.py', port: 5009 }
+  { name: 'Database Visualizer', path: '/Users/mileskesser/Desktop/dynamic-portfolio/database-copy/app.py', port: 5009 },
+  { name: 'Geocaching App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/geocaching_app/server.js', port: 3101 }, // Add the Geocaching App here
+
 
 ];
 
@@ -122,15 +124,97 @@ app.get('/run-final', (req, res) => {
           console.log(`${project.name} process exited with code ${code}`);
         });
 
-        res.send(`<h1>${project.name} project is running and will launch momentarily! You can click and drag to interact with the animation</h1>`);
+        res.send(`
+          <html>
+            <head>
+              <title>${project.name} - Running</title>
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  background-color: #121212;
+                  color: #f5f5f5;
+                  text-align: center;
+                  padding: 50px;
+                  margin: 0;
+                }
+                h1, p { /* Set the same color for both */
+                  font-size: 2rem;
+                  color: #ffffff;
+                  margin-bottom: 20px;
+                }
+                .instructions {
+                  color: #ffcc00;
+                  font-style: italic;
+                }
+              </style>
+            </head>
+            <body>
+              <h1>${project.name} Project is Running!</h1>
+              <p>The animation will launch momentarily.</p>
+              <p class="instructions">You can click and drag to interact with the animation.</p>
+            </body>
+          </html>
+        `);
       } else {
-        res.send(`<h1>${project.name} failed to build with code ${code}</h1>`);
+        res.send(`
+          <html>
+            <head>
+              <title>${project.name} - Build Failed</title>
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  background-color: #121212;
+                  color: #f5f5f5;
+                  text-align: center;
+                  padding: 50px;
+                  margin: 0;
+                }
+                h1, p { /* Set the same color for both */
+                  font-size: 2rem;
+                  color: #ffffff;
+                  margin-bottom: 20px;
+                }
+              </style>
+            </head>
+            <body>
+              <h1>${project.name} Build Failed</h1>
+              <p>The build process exited with code ${code}.</p>
+            </body>
+          </html>
+        `);
       }
     });
   } else {
-    res.send('<h1>Project not found!</h1>');
+    res.send(`
+      <html>
+        <head>
+          <title>Project Not Found</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              background-color: #121212;
+              color: #f5f5f5;
+              text-align: center;
+              padding: 50px;
+              margin: 0;
+            }
+            h1, p { /* Set the same color for both */
+              font-size: 2rem;
+              color: #ffffff;
+              margin-bottom: 20px;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Project Not Found!</h1>
+        </body>
+      </html>
+    `);
   }
 });
+
+
+
 
 
 // Route to directly launch the Weather App on port 5008
@@ -150,7 +234,35 @@ app.get('/run-weather-app', (req, res) => {
   }
 });
 
-/*
+// Route to launch the Geocaching App
+app.get('/run-geocaching', (req, res) => {
+  const project = projects.find(p => p.name === 'Geocaching App');
+
+  if (project && project.path) {
+    console.log(`Starting ${project.name} on port ${project.port}...`);
+
+    // Run the Geocaching App server
+    const geocachingProcess = spawn('node', [project.path]);
+
+    geocachingProcess.stdout.on('data', (data) => {
+      console.log(`${project.name} output: ${data}`);
+    });
+
+    geocachingProcess.stderr.on('data', (data) => {
+      console.error(`${project.name} error: ${data}`);
+    });
+
+    geocachingProcess.on('close', (code) => {
+      console.log(`${project.name} process exited with code ${code}`);
+    });
+
+    // Redirect to the appropriate port
+    res.redirect(`http://localhost:${project.port}`);
+  } else {
+    res.status(404).send('<h1>Geocaching App project not found!</h1>');
+  }
+});
+
 
 
 projects.forEach((project) => {
@@ -173,7 +285,7 @@ projects.forEach((project) => {
   
 });
 
-*/
+
 
 // Route to serve the video player page
 app.get('/play-video', (req, res) => {
@@ -254,12 +366,14 @@ app.get('/', (req, res) => {
   
       .container {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        grid-gap: 20px;
+        grid-template-columns: repeat(5, 250px); /* 5 fixed-width columns */
+        grid-gap: 20px; /* Space between cards */
         padding: 60px;
-        max-width: 1200px;
+        justify-content: center; /* Center horizontally */
+        align-content: center; /* Center vertically if the grid height grows */
         margin: auto;
       }
+      
   
       .quadrant {
         display: flex;
@@ -290,70 +404,6 @@ app.get('/', (req, res) => {
         text-align: center;
       }
   
-      .toggle-switch {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-      }
-  
-      .switch {
-        position: relative;
-        display: inline-block;
-        width: 40px;
-        height: 20px;
-      }
-  
-      .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-  
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: 0.4s;
-        border-radius: 34px;
-        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-      }
-  
-      .slider:before {
-        position: absolute;
-        content: "";
-        height: 16px;
-        width: 16px;
-        left: 2px;
-        bottom: 2px;
-        background-color: white;
-        transition: 0.4s;
-        border-radius: 50%;
-        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-      }
-  
-      input:checked + .slider {
-        background-color: #66bb6a;
-      }
-  
-      input:checked + .slider:before {
-        transform: translateX(20px);
-      }
-  
-      /* Dark Mode */
-      body.dark-mode {
-        background-color: #1e1e2e;
-        color: #e0e0e0;
-      }
-  
-      .dark-mode .quadrant {
-        color: #ffffff;
-        border: 1px solid #444444;
-      }
-  
       /* Light Mode */
       body.light-mode {
         background-color: #f2f2f5;
@@ -369,10 +419,6 @@ app.get('/', (req, res) => {
         color: #4d4d4d; /* More muted black for descriptions */
       }
       
-      /* Dark Mode Title and Description Text Colors */
-      .dark-mode .quadrant .title p {
-        color: #f2f2f2; /* Slightly off-white for titles */
-      }
       
       
   
@@ -380,32 +426,20 @@ app.get('/', (req, res) => {
       .light-mode #q2 { background-color: #ffdad7; } /* Light Coral */
       .light-mode #q3 { background-color: #ede4ff; } /* Light Purple */
       .light-mode #q4 { background-color: #e6f5e6; } /* Light Green */
-      .light-mode #q5 { background-color: #fff5d7; } /* Light Peach */
-      .light-mode #q6 { background-color: #d7f5f0; } /* Light Cyan */
-      .light-mode #q7 { background-color: #FFEAD7; } /* Light orange */
-     
-      .light-mode #q8 { background-color: #fff0f5; } /* Lavender Blush */
-     
-      
+      .light-mode #q5 { background-color: #fff5d7; } /* Light yellow */
+      .light-mode #q6 { background-color: #e6f5e6; } 
+      .light-mode #q7 { background-color: #fff5d7; } 
+      .light-mode #q8 { background-color: #ede4ff; } 
+      .light-mode #q9 { background-color: #d7ebff; } 
+      .light-mode #q10 { background-color: #ffdad7; } 
 
-  
-      /* Dark Mode Colors */
-      .dark-mode #q1 { background-color: #007bff; } /* Deep Steel Blue */
-      .dark-mode #q2 { background-color: #D14141; } /* Muted Deep Red */
-      .dark-mode #q3 { background-color: #6A4CA6; } /* Muted Royal Purple */
-      .dark-mode #q4 { background-color: #4CAF50; } /* Muted Forest Green */
-      .dark-mode #q5 { background-color: #F4C542; } /* Muted yellow */
-      .dark-mode #q6 { background-color: #26A69A; } /* Muted Teal Green */
-      .dark-mode #q7 { background-color: #FFB74D; } /* Muted Mustard Brown */
-      .dark-mode #q8 { background-color: #8B0000; } /* Dark Red */
+
   
       
       .light-mode #q3 img {
         filter: brightness(0.0);
       }
-      .dark-mode #q3 img {
-        filter: brightness(1.0);
-      }
+ 
 
 
       #q3 img {
@@ -436,72 +470,98 @@ app.get('/', (req, res) => {
     </style>
   </head>
   <body class="light-mode">
-    <div class="toggle-switch">
-      <label class="switch">
-        <input type="checkbox" id="mode-toggle" onclick="toggleMode()">
-        <span class="slider"></span>
-      </label>
-    </div>
+  
 
     
     <h1>Dynamic Portfolio</h1>
   
     <div class="container">
+
+      
       <a href="http://localhost:5002" id="q1" class="quadrant">
         <div class="title">Exercise tracker API</div>
         <img src="www.png" alt="Exercise Tracker Image">
         <p>A full stack REST API website for tracking workouts</p>
       </a>
+
+
       <a href="http://localhost:3000/run-final" id="q2" class="quadrant">
         <div class="title">OpenGL graphics</div>
         <img src="opengl.png" alt="OpenGL Animation Image">
         <p>Billiards table animation rendered with OpenGL</p>
       </a>
-      <a href="/rock-paper-scissors" id="q3" class="quadrant">
-        <div class="title">Rock Paper Scissors <br> Lizard Spock</div>
-        <img src="RPS.png" alt="Rock Paper Scissors Image">
-        <p>A twist on Rock Paper Scissors played against a robot opponent</p>
-      </a>
+
       <a href="https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496" id="q4" class="quadrant">
         <div class="title">Figma prototype</div>
         <img src="figma.png" alt="Figma Example Image">
         <p>Figma prototype for a book review website</p>
       </a>
+
       <a href="http://localhost:3000/run-weather-app" id="q5" class="quadrant">
         <div class="title">Weather app</div>
         <img src="weather.png" alt="Weather Dashboard Image">
         <p>Displays weather with locational city backgrounds</p>
       </a>
-      <a href="/play-video" id="q6" class="quadrant">
-        <div class="title">Mobile app</div>
-        <img src="app.png" alt="Video Project Image">
-        <p>Kotlin Android mobile app video demonstration</p>
+
+
+   
+
+
+     
+      <a href="/rock-paper-scissors" id="q3" class="quadrant">
+        <div class="title">Rock Paper Scissors <br> Lizard Spock</div>
+        <img src="RPS.png" alt="Rock Paper Scissors Image">
+        <p>A twist on Rock Paper Scissors played against a robot opponent</p>
       </a>
+
+
+
       <a href="/game" id="q7" class="quadrant">
       <div class="title">Maze Game</div>
       <img src="game.png" alt="Game Image">
       <p>First person maze game</p>
     </a>
-    <a href="/alien" id="q8" class="quadrant">
-  <div class="title">Alien Game</div>
-  <img src="alien.png" alt="Alien Image">
-  <p>Arcade style laser dodging game</p>
-</a>
 
-<a href="/run-database" id="q9" class="quadrant">
-        <div class="title">Database Visualizer</div>
-        <p>Interactive SQL database viewer</p>
+
+      <a href="/alien" id="q8" class="quadrant">
+      <div class="title">Alien Game</div>
+      <img src="alien.png" alt="Alien Image">
+      <p>Arcade style laser dodging game</p>
+    </a>
+ 
+      
+
+      <a href="/run-database" id="q9" class="quadrant">
+      <div class="title">Database Visualizer</div>
+      <img src="database.png" alt="Database Image">
+      <p>Interactive SQL database viewer</p>
+    </a>
+
+    <a  href="/run-geocaching" id="q10" class="quadrant">
+    <div class="title">Geocache</div>
+    <img src="geocache.png" alt="Geocache Image">
+    <p>A geocaching scavenger hunt</p>
+  </a>
+
+    
+
+
+  <a href="/play-video" id="q6" class="quadrant">
+        <div class="title">Mobile app</div>
+        <img src="app.png" alt="Video Project Image">
+        <p>Kotlin Android mobile app video demonstration</p>
       </a>
+
+   
+    
+
+
+ 
 
 
     </div>
   
-    <script>
-      function toggleMode() {
-        document.body.classList.toggle('dark-mode');
-        document.body.classList.toggle('light-mode');
-      }
-    </script>
+    
   </body>
   </html>
   
