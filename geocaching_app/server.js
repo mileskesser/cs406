@@ -8,19 +8,23 @@ const geocaches = [
         clue: "Test your device's GPS functionality to ensure accurate location tracking.",
         latitude: 45.51154679582722,
         longitude: -122.6138918571162,
-        buttonText: "Test Location Tracking" // Custom button text for the first clue
+        buttonText: "Test Location Tracking" 
     },
     {
         clue: "Your next clue can be found at the hardware store with the wooden mascot.",
         latitude: 45.519400153385064,
         longitude: -122.58441910753297,
-        buttonText: "Found It!" // Default button text for subsequent clues
+        //latitude: 45.51154679582722,
+        //longitude: -122.6138918571162,
+        buttonText: "Found It!" 
     },
     {
         clue: "Finally, find the opposite of the pancake door.",
         latitude: 45.51182674238814,
         longitude: -122.62656828109401,
-        buttonText: "Found It!" // Default button text for subsequent clues
+        //latitude: 45.51154679582722,
+        //longitude: -122.6138918571162,
+        buttonText: "Found It!" 
     }
 ];
 

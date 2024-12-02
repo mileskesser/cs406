@@ -15,7 +15,7 @@ const projects = [
   { name: 'Weather App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/weatherApp/backend/server.js', port: 5008 },
   { name: 'Game', url: '/game' },
   { name: 'Alien Game', url: '/alien' },
-  { name: 'Database Visualizer', path: '/Users/mileskesser/Desktop/dynamic-portfolio/database-copy/app.py', port: 5009 },
+  { name: 'Database Visualizer', path: '../database-copy/app.py', port: 5009 },
   { name: 'Geocaching App', path: '/Users/mileskesser/Desktop/dynamic-portfolio/geocaching_app/server.js', port: 3101 }, // Add the Geocaching App here
 
 
@@ -23,7 +23,7 @@ const projects = [
 
 app.use(express.static(path.join(__dirname, '../')));
 
-// Ensure dependencies
+
 function ensureDependencies(dependency) {
   try {
     require.resolve(dependency);
@@ -35,7 +35,6 @@ function ensureDependencies(dependency) {
   }
 }
 
-// Ensure required dependencies are installed
 ensureDependencies('sqlite3');
 
 // Route for database visualizer
