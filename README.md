@@ -29,7 +29,14 @@ If you have Homebrew and Node installed, skip to step 3, otherwise follow instal
    ```bash
    npm install
 
-- **Start the app:**
+- **Run the app:**
    ```bash
    cd Homepage
    node index.js
+   
+- **Launch the app:**
+
+  "Portfolio homepage running at http://localhost:3000" should appear. 
+  
+  Hold cmd key and click http://localhost:3000 to launch in browser.
+  
