@@ -5,16 +5,8 @@
   "main": "file1.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "postinstall": "npm install && cd OpenGL && make"
+    "start": "node index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "body-parser": "^1.20.3",
-    "ejs": "^3.1.10",
-    "express": "^4.21.1",
-    "sqlite3": "^5.1.7"
-  }
+  "dependencies": {},
+  "devDependencies": {}
 }
