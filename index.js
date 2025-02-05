@@ -5,61 +5,46 @@ const { exec } = require('child_process');
 const fs = require('fs');  
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 
-
-
-app.use(express.static(path.join(__dirname)));
-
-/*
-const projects = [
-  { name: 'OpenGL Animation', type: 'cpp', makePath: '../OpenGL', executable: './sample', port: 4000 },
-  { name: 'Exercise Tracker App', path: '../exercise-app/backend/server.js', port: 5002 },
-  { name: 'Rock Paper Scissors Game', url: '/rock-paper-scissors' },
-  { name: 'Figma Example', url: 'https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496' },
-  { name: 'Weather App', path: '../weatherApp/backend/server.js', port: 5008 },
-  { name: 'Game', url: '../game' },
-  { name: 'Alien Game', url: '../alien' },
-  { name: 'Database Visualizer', path: '../database-copy/app.py', port: 5009 },
-  { name: 'Geocaching App', path: '../geocaching_app/server.js', port: 3101 }, // Add the Geocaching App here
-
-];*/
+const BASE_DIR = __dirname;
+//app.use(express.static(path.join(__dirname)));
 
 
 const projects = [
   {
     name: 'OpenGL Animation',
     type: 'cpp',
-    makePath: '../OpenGL', // Directory where the Makefile resides
-    executable: './sample', // OpenGL executable
+    makePath: path.join(BASE_DIR, 'OpenGL'),
+    executable: './sample',
     port: 4000,
   },
   {
     name: 'Exercise Tracker App',
-    path: path.join(__dirname, 'exercise-app', 'backend', 'server.js'),
+    path: path.join(BASE_DIR, 'exercise-app', 'backend', 'server.js'),
     port: 5002,
   },
   {
     name: 'Geocaching App',
-    path: path.join(__dirname, 'geocaching_app', 'server.js'),
+    path: path.join(BASE_DIR, 'geocaching_app', 'server.js'),
     port: 3101,
   },
   {
     name: 'Weather App',
-    path: path.join(__dirname, 'weatherApp', 'backend', 'server.js'),
+    path: path.join(BASE_DIR, 'weatherApp', 'backend', 'server.js'),
     port: 5008,
   },
   {
     name: 'Database Visualizer',
-    path: path.join(__dirname, 'database-copy', 'app.py'),
+    path: path.join(BASE_DIR, 'database-copy', 'app.py'),
     port: 5009,
   },
 ];
 
 
-
-app.use(express.static(path.join(__dirname, '../')));
+app.use(express.static(BASE_DIR));
+//app.use(express.static(path.join(__dirname, '../')));
 
 
 function ensureDependencies(dependency) {
@@ -76,7 +61,14 @@ function ensureDependencies(dependency) {
 ensureDependencies('sqlite3');
 
 
-// Route for database visualizer
+app.get('/', (req, res) => {
+  res.sendFile(path.join(BASE_DIR, 'index.html'));
+});
+
+
+
+
+
 
 app.get('/run-final', (req, res) => {
   const project = projects.find((p) => p.name === 'OpenGL Animation');
@@ -274,24 +266,24 @@ app.get('/run-database', (req, res) => {
 
 
 
-
-
 app.get('/rock-paper-scissors', (req, res) => {
-  res.sendFile(path.join(__dirname, '/rock_paper_scissors.html'));  
+  res.sendFile(path.join(BASE_DIR, 'rock_paper_scissors.html'));  
 });
 
+// ✅ Run Game
 app.get('/game', (req, res) => {
-  res.sendFile(path.join(__dirname, '/game.html'));
+  res.sendFile(path.join(BASE_DIR, 'game.html'));
 });
 
 
+// ✅ Run Alien Game
 app.get('/alien', (req, res) => {
-  res.sendFile(path.join(__dirname, '/alien.html'));
+  res.sendFile(path.join(BASE_DIR, 'alien.html'));
 });
 
 
 
-// Route to directly launch the Weather App on port 5008
+// ✅ Start Weather App
 app.get('/run-weather-app', (req, res) => {
   const project = projects.find(p => p.name === 'Weather App');
   if (project) {
@@ -308,35 +300,23 @@ app.get('/run-weather-app', (req, res) => {
   }
 });
 
-// Route to launch the Geocaching App
+
+// ✅ Start Geocaching App
 app.get('/run-geocaching', (req, res) => {
   const project = projects.find(p => p.name === 'Geocaching App');
-
-  if (project && project.path) {
+  if (project) {
     console.log(`Starting ${project.name} on port ${project.port}...`);
-
-    // Run the Geocaching App server
     const geocachingProcess = spawn('node', [project.path]);
 
-    geocachingProcess.stdout.on('data', (data) => {
-      console.log(`${project.name} output: ${data}`);
-    });
+    geocachingProcess.stdout.on('data', (data) => console.log(`${project.name} output: ${data}`));
+    geocachingProcess.stderr.on('data', (data) => console.error(`${project.name} error: ${data}`));
 
-    geocachingProcess.stderr.on('data', (data) => {
-      console.error(`${project.name} error: ${data}`);
-    });
-
-    geocachingProcess.on('close', (code) => {
-      console.log(`${project.name} process exited with code ${code}`);
-    });
-
-    // Redirect to the appropriate port
+    geocachingProcess.on('close', (code) => console.log(`${project.name} process exited with code ${code}`));
     res.redirect(`http://localhost:${project.port}`);
   } else {
-    res.status(404).send('<h1>Geocaching App project not found!</h1>');
+    res.send('<h1>Geocaching App project not found!</h1>');
   }
 });
-
 
 
 projects.forEach((project) => {
@@ -419,10 +399,7 @@ app.get('/video.mov', (req, res) => {
   });
 });
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
 
-app.listen(port, () => {
-  console.log(`\nPortfolio homepage running at http://localhost:${port}\n`);
+app.listen(port, '0.0.0.0', () => {
+  console.log(`\n🌍 Portfolio homepage running at http://localhost:${port} (accessible from any device!)\n`);
 });
