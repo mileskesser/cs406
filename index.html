@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Portfolio</title>
+    <style>
+      /* Base Styles */
+      body, html {
+        height: 100%;
+        margin: 0;
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+  
+      .container {
+        display: grid;
+        grid-template-columns: repeat(5, 250px); /* 5 fixed-width columns */
+        grid-gap: 20px; /* Space between cards */
+        padding: 60px;
+        justify-content: center; /* Center horizontally */
+        align-content: center; /* Center vertically if the grid height grows */
+        margin: auto;
+      }
+      
+  
+      .quadrant {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        height: 250px;
+        position: relative;
+      }
+  
+      .quadrant:hover {
+        transform: translateY(-8px);
+        box-shadow: 0px 12px 20px rgba(0, 0, 0, 0.3);
+      }
+  
+      .title {
+        position: absolute;
+        top: 20px;
+        font-size: 20px;
+        font-weight: 600;
+        width: 100%;
+        text-align: center;
+      }
+  
+      /* Light Mode */
+      body.light-mode {
+        background-color: #f2f2f5;
+       
+      }
+
+      /* Light Mode Title and Description Text Colors */
+      .light-mode .quadrant .title {
+        color: #1a1a1a; /* Slightly subdued black for titles */
+      }
+      
+      .light-mode .quadrant p {
+        color: #4d4d4d; /* More muted black for descriptions */
+      }
+      
+      
+      
+  
+      .light-mode #q1 { background-color: #d7ebff; } /* Light Blue */
+      .light-mode #q2 { background-color: #ffdad7; } /* Light Coral */
+      .light-mode #q3 { background-color: #ede4ff; } /* Light Purple */
+      .light-mode #q4 { background-color: #e6f5e6; } /* Light Green */
+      .light-mode #q5 { background-color: #fff5d7; } /* Light yellow */
+      .light-mode #q6 { background-color: #e6f5e6; } 
+      .light-mode #q7 { background-color: #fff5d7; } 
+      .light-mode #q8 { background-color: #ede4ff; } 
+      .light-mode #q9 { background-color: #d7ebff; } 
+      .light-mode #q10 { background-color: #ffdad7; } 
+      
+      .light-mode #q3 img {
+        filter: brightness(0.0);
+      }
+
+
+      #q3 img {
+        width: 105%; 
+  
+      }
+    
+  
+      .quadrant img {
+        width: 70%;
+        height: 60%;
+        object-fit: contain;
+        margin-top: 20px;
+      }
+      
+      .quadrant p {
+        font-size: 14px;
+        margin-top: 15px;
+      }
+  
+      h1 {
+        text-align: center;
+        font-size: 36px;
+        margin-bottom: 40px;
+        padding-top: 20px;
+      }
+
+      /* Info Button */
+    .info-button {
+      position: absolute;
+      bottom: 10px;
+      background-color: #6e6e6e;
+
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      z-index: 10;
+    }
+
+
+    .tooltip {
+      position: absolute;
+      bottom: 40px; /* Adjusted so it's above the info button */
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: black;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      width: 85%; /* Matches the project button width */
+      max-height: 200px;
+      text-align: center;
+      white-space: normal; /* Allows text wrapping */
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 10;
+      overflow-wrap: break-word; /* Ensures long words don't break layout */
+    }
+    
+    
+    
+
+    .info-button:hover + .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+
+
+    .tooltip ul {
+      font-size: 1em;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+      text-align: left;
+    }
+    
+    .tooltip li {
+      margin-bottom: 5px;
+    }
+    
+    .tooltip li ul {
+      margin-top: 5px;
+      margin-left: 15px; /* Indent sub-list items */
+      list-style-type: disc; /* Use bullets for nested lists */
+    }
+    </style>
+  </head>
+  <body class="light-mode">
+  
+
+    
+    <h1>Dynamic Portfolio</h1>
+  
+    <div class="container">
+
+      
+      <a href="http://localhost:5002" id="q1" class="quadrant">
+        <div class="title">Exercise tracker API</div>
+        <img src="www.png" alt="Exercise Tracker Image">
+        <p>A full stack REST API website for tracking workouts</p>
+        <button class="info-button">i</button>
+        <div class="tooltip">
+  <ul>
+    <li><strong>Frontend:</strong>
+      <ul>
+        <li>HTML, CSS, JavaScript</li>
+        <li>Fetch API</li>
+      </ul>
+    </li>
+    <li><strong>Backend:</strong>
+      <ul>
+        <li>Node.js, Express.js</li>
+        <li>CRUD operations</li>
+      </ul>
+    </li>
+    <li><strong>Skills:</strong>
+      <ul>
+        <li>Full-stack development</li>
+        <li>Dynamic data handling</li>
+      </ul>
+    </li>
+  </ul>
+</div>
+      </a>
+
+
+      <a href="http://localhost:3000/run-final" id="q2" class="quadrant">
+        <div class="title">OpenGL graphics</div>
+        <img src="opengl.png" alt="OpenGL Animation Image">
+        <p>Billiards table animation rendered with OpenGL</p>
+        <button class="info-button">i</button>
+        <div class="tooltip">
+        <ul>
+      
+        <li><strong>Graphics:</strong>
+          <ul>
+            <li>OpenGL, GLFW, GLUT, GLEW</li>
+          </ul>
+        </li>
+        <li><strong>Shaders:</strong>
+          <ul>
+            <li>GLSL (OpenGL Shading Language)</li>
+          </ul>
+        </li>
+        <li><strong>Skills:</strong>
+        <ul>
+          <li>3D rendering and modeling</li>
+          <li>Shader programming with GLSL</li>
+          <li>Dynamic lighting and texturing</li>
+        </ul>
+      </li>
+       
+      </ul>
+      
+
+        
+        </div>
+      </a>
+
+      <a href="https://www.figma.com/proto/SgjkZcaZmcUWda479hmU1O/Design-Gallery-(Post-your-Clickable-Prototype)?type=design&node-id=27-496&scaling=scale-down&page-id=0%3A1&starting-point-node-id=27%3A496" id="q4" class="quadrant">
+        <div class="title">Figma prototype</div>
+        <img src="figma.png" alt="Figma Example Image">
+        <p>Figma prototype for a book review website</p>
+        <button class="info-button">i</button>
+        <div class="tooltip">
+        <ul>
+  <li><strong>Project Type:</strong>
+    <ul>
+      <li>UI/UX Design</li>
+      <li>Wireframing</li>
+    </ul>
+  </li>
+  <li><strong>Tools:</strong>
+    <ul>
+      <li>Figma</li>
+      <li>Design Plugins (e.g., Iconify, Unsplash)</li>
+    </ul>
+  </li>
+
+  <li><strong>Skills:</strong>
+    <ul>
+      <li>Prototyping user experiences</li>
+      <li>Collaborative design workflows</li>
+    </ul>
+  </li>
+</ul>
+
+        
+        </div>
+      </a>
+
+      <a href="http://localhost:3000/run-weather-app" id="q5" class="quadrant">
+        <div class="title">Weather app</div>
+        <img src="weather.png" alt="Weather Dashboard Image">
+        <p>Displays weather with locational city backgrounds</p>
+        <button class="info-button">i</button>
+        <div class="tooltip">
+        <ul>
+ 
+        <li><strong>Frontend:</strong>
+          <ul>
+            <li>HTML, CSS, JavaScript</li>
+          </ul>
+        </li>
+        <li><strong>Backend:</strong>
+          <ul>
+            <li>Node.js, Express.js, Axios</li>
+            <li>OpenWeather and Unsplash APIs</li>
+          </ul>
+        </li>
+        <li><strong>Skills:</strong>
+          <ul>
+            <li>API integration and data parsing</li>
+            <li>Asynchronous programming</li>
+        
+          </ul>
+        </li>
+      </ul>
+      
+      </div>
+      </a>
+
+
+   
+
+
+     
+      <a href="/rock-paper-scissors" id="q3" class="quadrant">
+        <div class="title">Rock Paper Scissors <br> Lizard Spock</div>
+        <img src="RPS.png" alt="Rock Paper Scissors Image">
+        <p>A twist on Rock Paper Scissors played against a robot opponent</p>
+        <button class="info-button">i</button>
+        <div class="tooltip"> <ul>
+        <li><strong>Project Type:</strong>
+          <ul>
+            <li>Interactive Game</li>
+            <li>Randomized Gameplay</li>
+          </ul>
+        </li>
+        <li><strong>Frontend:</strong>
+          <ul>
+            <li>HTML, CSS, JavaScript</li>
+          </ul>
+        </li>
+    
+        <li><strong>Skills:</strong>
+          <ul>
+            <li>Game Logic Implementation</li>
+            <li>Responsive UI Design</li>
+            <li>CSS Styling for Animations</li>
+          </ul>
+        </li>
+      </ul>
+
+      </div>
+       
+      </a>
+
+
+
+      <a href="/game" id="q7" class="quadrant">
+      <div class="title">Maze Game</div>
+      <img src="game.png" alt="Game Image">
+      <p>First person maze game</p>
+      <button class="info-button">i</button>
+        <div class="tooltip">
+        <ul>
+
+  <li><strong>Technologies:</strong>
+    <ul>
+      <li>Three.js, JavaScript, HTML</li>
+    </ul>
+  </li>
+  <li><strong>Graphics:</strong>
+    <ul>
+      <li>Directional, Ambient Lighting</li>
+      <li>Shadows for Depth Perception</li>
+    </ul>
+  </li>
+  <li><strong>Skills:</strong>
+    <ul>
+      <li>3D Game Development</li>
+      <li>Collision Detection Logic</li>
+      <li>Graphics Rendering</li>
+    </ul>
+  </li>
+</ul>
+
+</div>
+    </a>
+
+
+      <a href="/alien" id="q8" class="quadrant">
+      <div class="title">Alien Game</div>
+      <img src="alien.png" alt="Alien Image">
+      <p>Arcade style laser dodging game</p>
+      <button class="info-button">i</button>
+      <div class="tooltip">
+      <ul>
+  
+  <li><strong>Technologies:</strong>
+    <ul>
+      <li>HTML, JavaScript, CSS</li>
+    </ul>
+  </li>
+
+  <li><strong>Gameplay Mechanics:</strong>
+    <ul>
+      <li>Key Controlled Movement</li>
+      <li>Incremental Difficulty</li>
+    </ul>
+  </li>
+  <li><strong>Skills Demonstrated:</strong>
+    <ul>
+      <li>Game Development</li>
+      <li>Real-Time Rendering</li>
+      <li>Randomized Mathmatical Algorithms</li>
+    </ul>
+  </li>
+</ul>
+</div>
+    </a>
+ 
+      
+
+      <a href="/run-database" id="q9" class="quadrant">
+      <div class="title">Database Visualizer</div>
+      <img src="database.png" alt="Database Image">
+      <p>Interactive SQL database viewer</p>
+      <button class="info-button">i</button>
+      <div class="tooltip"><ul>
+   
+      <li><strong>Technologies:</strong>
+        <ul>
+          <li>Flask, SQLite, JavaScript, HTML, CSS</li>
+        </ul>
+      </li>
+
+      <li><strong>Skills Demonstrated:</strong>
+        <ul>
+    
+          
+          <li>Database Design and Management</li>
+          <li>Web Development</li>
+          <li>Error Handling and Validation </li>
+          <li>Frontend-Backend Integration</li>
+        </ul>
+      </li>
+    </ul>
+    
+    </div>
+    </a>
+
+    <a  href="/run-geocaching" id="q10" class="quadrant">
+    <div class="title">Geocache</div>
+    <img src="geocache.png" alt="Geocache Image">
+    <p>A geocaching scavenger hunt</p>
+    <button class="info-button">i</button>
+    <div class="tooltip">
+    <ul>
+
+  <li><strong>Technologies:</strong>
+    <ul>
+      <li>Node.js, Express.js, HTML, CSS, JavaScript</li>
+    </ul>
+    </li>
+  
+
+
+  <li><strong>Skills Demonstrated:</strong>
+    <ul>
+      <li>Real-Time GPS-Based Location Tracking</li>
+      <li>Backend API Design and Implementation</li>
+      <li>Dynamic Content Rendering</li>
+     
+    </ul>
+  </li>
+</ul>
+
+</div>
+  </a>
+
+    
+
+
+  <a href="/play-video" id="q6" class="quadrant">
+        <div class="title">Mobile app</div>
+        <img src="app.png" alt="Video Project Image">
+        <p>Kotlin Android mobile app video demonstration</p>
+        <button class="info-button">i</button>
+        <div class="tooltip">
+        <ul>
+  <li><strong>Technologies:</strong>
+    <ul>
+      <li>Kotlin, Jetpack, Android Studio </li>
+    </ul>
+  </li>
+  <li><strong>Skills:</strong>
+    <ul>
+      <li>Android development </li>
+      <li>Dynamic data handling </li>
+      <li>Mobile App Development</li>
+    </ul>
+  </li>
+</ul>
+
+</div>
+      </a>
+
+   
+
+
+
+ 
+
+
+    </div>
+  
+    
+  </body>
+  </html>
+  

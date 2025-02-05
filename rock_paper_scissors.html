@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rock Paper Scissors Lizard Spock</title>
+    
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -25,29 +25,36 @@
         }
 
         .rules {
-            max-width: 600px;
-            font-size: 1.2em;
+        max-width: 600px;
+        font-size: 1.2em;
+        color: #555;
+        background-color: #fff;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 1em;
+        box-shadow: 0 7px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .rules-columns {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .rules-columns ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        
+    }
+
+    .rules-columns li {
+        margin-bottom: 8px;
+    }
+
+        .instructions {
+            font-size: 1.8em;
             color: #555;
-            background-color: #fff;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 1em;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .rules-columns {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .rules-columns ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .rules-columns li {
-            margin-bottom: 8px;
+            margin-bottom: 0.5em;
         }
 
         .score {
@@ -59,37 +66,32 @@
         .choices {
             display: flex;
             justify-content: center;
-            margin: 2em 0; /* Increased margin to move choices downward */
+            margin: 1em 0;
+       
         }
 
         .choice {
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
             margin: 0 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+           
         }
 
         .choice img {
-            width: 150px;
-            height: 150px;
-            transition: transform 0.2s ease;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            background-color: white; /* Make the choice background white */
-        }
+    width: 150px;
+    height: 150px;
+    background-color: #fff; /* Matches the instructions box */
+    border-radius: 8px;
+    border: 2px solid #ddd; /* Light border for better visibility */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 10px; /* Add padding to center the image */
+}
 
-        .choice:hover img {
-            transform: scale(1.2);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .choice p {
-            margin-top: 20px; /* Adds spacing between the image and the text */
-            color: black; /* Black text for choice names */
-            font-size: 1.2em;
-        }
+.choice:hover img {
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
 
         .result {
             font-size: 2em;
@@ -109,9 +111,71 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        #overlay, #congratsOverlay, #robotWinsOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            padding: 20px;
+        }
+
+        #overlayText {
+            font-size: 2.5em;
+            animation: fadein 1s;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        #congratsContent, #robotWinsContent {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        #goldMedal {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+
+        #congratsMessage, #robotWinsText {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #FFD700; 
+        }
+
+        #playAgainBtn, #robotPlayAgainBtn {
+            padding: 15px 40px;
+            font-size: 1.2em;
+            cursor: pointer;
+            background: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        #playAgainBtn:hover, #robotPlayAgainBtn:hover {
+            background: #45a049;
+        }
+
+        @keyframes fadein {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body>
+
     <h1>Rock Paper Scissors Lizard Spock</h1>
 
     <div class="rules">
@@ -138,6 +202,7 @@
         Your Score: <span id="playerScore">0</span> | Robot Score: <span id="robotScore">0</span>
     </div>
 
+
     <div class="choices">
         <div class="choice" id="rock">
             <img src="./RPS-pngs/rock.png" alt="Rock">
@@ -163,5 +228,141 @@
 
     <div class="result" id="resultText">Choose your move to play!</div>
     <div id="loadingIcon">🤖</div>
+
+
+    <div id="overlay">
+        <div id="overlayText"></div>
+    </div>
+
+    <div id="congratsOverlay">
+        <div id="congratsContent">
+            <img id="goldMedal" src="./RPS-pngs/gold-medal.png" alt="Gold Medal">
+            <div id="congratsMessage">Congrats! You won!</div>
+            <button id="playAgainBtn" onclick="resetGame()">Play Again</button>
+        </div>
+    </div>
+
+    <div id="robotWinsOverlay">
+        <div id="robotWinsContent">
+            <div id="robotWinsText">Robot Wins! Better Luck Next Time!</div>
+            <button id="robotPlayAgainBtn" onclick="resetGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        let playerScore = 0;
+        let robotScore = 0;
+
+        const choices = ["rock", "paper", "scissors", "lizard", "spock"];
+        const choiceElements = document.querySelectorAll('.choice');
+        const resultText = document.getElementById('resultText');
+        const loadingIcon = document.getElementById('loadingIcon');
+        const overlay = document.getElementById('overlay');
+        const overlayText = document.getElementById('overlayText');
+        const congratsOverlay = document.getElementById('congratsOverlay');
+        const robotWinsOverlay = document.getElementById('robotWinsOverlay');
+
+        choiceElements.forEach(choice => choice.addEventListener('click', handleClick));
+
+        function handleClick(event) {
+            const playerChoice = event.currentTarget.id;
+
+            resultText.innerHTML = "";
+
+            highlightPlayerChoice(playerChoice);
+
+            loadingIcon.style.display = "block";
+
+            setTimeout(() => {
+                loadingIcon.style.display = "none";
+                playRound(playerChoice);
+            }, 1000);
+        }
+
+        function highlightPlayerChoice(playerChoice) {
+            choiceElements.forEach(choice => choice.classList.remove('large-choice'));
+            document.getElementById(playerChoice).classList.add('large-choice');
+        }
+
+        function playRound(playerChoice) {
+            const robotChoice = choices[Math.floor(Math.random() * choices.length)];
+            const resultMessage = determineWinner(playerChoice, robotChoice);
+
+            if (resultMessage.includes("You win")) {
+                playerScore++;
+            } else if (resultMessage.includes("Robot wins")) {
+                robotScore++;
+            }
+
+            document.getElementById('playerScore').innerText = playerScore;
+            document.getElementById('robotScore').innerText = robotScore;
+
+            showOverlay(resultMessage);
+
+            checkGameOver();
+        }
+
+        function showOverlay(resultMessage) {
+            overlayText.innerHTML = resultMessage;
+            overlay.style.display = "flex";
+
+            setTimeout(() => {
+                overlay.style.display = "none";
+            }, 3000);
+        }
+
+        function checkGameOver() {
+            if (playerScore >= 2 || robotScore >= 2) {
+                setTimeout(() => endGame(), 500);
+            }
+        }
+
+        function endGame() {
+            if (playerScore > robotScore) {
+                congratsOverlay.style.display = "flex";
+            } else {
+                robotWinsOverlay.style.display = "flex";
+            }
+            disableChoices();
+        }
+
+        function resetGame() {
+            playerScore = 0;
+            robotScore = 0;
+            document.getElementById('playerScore').innerText = playerScore;
+            document.getElementById('robotScore').innerText = robotScore;
+            resultText.innerHTML = "Choose your move to play!";
+            congratsOverlay.style.display = "none";
+            robotWinsOverlay.style.display = "none";
+            choiceElements.forEach(choice => choice.addEventListener('click', handleClick));
+        }
+
+        function disableChoices() {
+            choiceElements.forEach(choice => choice.removeEventListener('click', handleClick));
+        }
+
+        function determineWinner(player, robot) {
+            if (player === robot) {
+                return `You chose ${player}. Robot chose ${robot}.<br><br>It's a tie!`;
+            }
+
+            const outcomes = {
+                rock: { scissors: "Rock crushes scissors", lizard: "Rock crushes lizard" },
+                paper: { rock: "Paper covers rock", spock: "Paper disproves Spock" },
+                scissors: { paper: "Scissors cuts paper", lizard: "Scissors decapitates lizard" },
+                lizard: { spock: "Lizard poisons Spock", paper: "Lizard eats paper" },
+                spock: { scissors: "Spock smashes scissors", rock: "Spock vaporizes rock" }
+            };
+
+            const result = outcomes[player][robot];
+
+            if (result) {
+                return `You chose ${player}. Robot chose ${robot}.<br><br>${result}.<br><br>You win this round!`;
+            } else {
+                return `You chose ${player}. Robot chose ${robot}.<br><br>${outcomes[robot][player]}.<br><br>Robot wins this round!`;
+            }
+        }
+    </script>
+
 </body>
 </html>
